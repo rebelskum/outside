@@ -14,6 +14,7 @@ export function TripBuilderPage() {
   const {
     trip,
     setDestination,
+    needsDestinationChangeConfirmation,
     setLodging,
     setTravelers,
     setDates,
@@ -29,7 +30,12 @@ export function TripBuilderPage() {
   const stepContent = () => {
     switch (trip.currentStep) {
       case "destination":
-        return <DestinationStep onSelect={setDestination} />;
+        return (
+          <DestinationStep
+            onSelect={setDestination}
+            needsConfirmation={needsDestinationChangeConfirmation}
+          />
+        );
       case "stay":
         return (
           <StayStep

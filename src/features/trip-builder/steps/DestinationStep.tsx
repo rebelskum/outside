@@ -10,11 +10,13 @@ const VIBES: { id: Vibe; label: string; emoji: string }[] = [
 
 interface DestinationStepProps {
   onSelect: (destinationId: string) => void;
+  needsConfirmation: (destinationId: string) => boolean;
 }
 
-export function DestinationStep({ onSelect }: DestinationStepProps) {
+export function DestinationStep({ onSelect, needsConfirmation }: DestinationStepProps) {
   const [query, setQuery] = useState("");
   const [selectedVibe, setSelectedVibe] = useState<Vibe | null>(null);
+  const [pendingDestinationId, setPendingDestinationId] = useState<string | null>(null);
 
   const searchResults = query.length >= 2
     ? destinations.filter((d) =>
@@ -29,6 +31,14 @@ export function DestinationStep({ onSelect }: DestinationStepProps) {
 
   const showSearchResults = query.length >= 2;
   const showVibeResults = !showSearchResults && selectedVibe !== null;
+
+  const handleSelect = (id: string) => {
+    if (needsConfirmation(id)) {
+      setPendingDestinationId(id);
+    } else {
+      onSelect(id);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center px-8 pt-24 pb-16">
@@ -57,7 +67,7 @@ export function DestinationStep({ onSelect }: DestinationStepProps) {
             searchResults.map((dest) => (
               <button
                 key={dest.id}
-                onClick={() => onSelect(dest.id)}
+                onClick={() => handleSelect(dest.id)}
                 className="w-full px-6 py-4 text-left hover:bg-surface transition-colors border-b border-border last:border-b-0"
               >
                 <p className="font-medium text-sm">{dest.name}</p>
@@ -102,7 +112,7 @@ export function DestinationStep({ onSelect }: DestinationStepProps) {
               {vibeResults.map((dest) => (
                 <button
                   key={dest.id}
-                  onClick={() => onSelect(dest.id)}
+                  onClick={() => handleSelect(dest.id)}
                   className="w-full rounded-xl border border-border bg-white p-5 text-left hover:border-brand/30 hover:shadow-sm transition-all"
                 >
                   <div className="flex items-center gap-4">
@@ -119,6 +129,35 @@ export function DestinationStep({ onSelect }: DestinationStepProps) {
             </div>
           )}
         </>
+      )}
+
+      {/* Confirmation modal */}
+      {pendingDestinationId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
+          <div className="mx-4 w-full max-w-sm rounded-2xl bg-white p-6 shadow-lg">
+            <p className="text-base font-semibold">Change destination?</p>
+            <p className="mt-2 text-sm text-muted leading-relaxed">
+              This will reset your stay, activities, and extras.
+            </p>
+            <div className="mt-6 flex gap-3 justify-end">
+              <button
+                onClick={() => setPendingDestinationId(null)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-muted hover:text-brand transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  onSelect(pendingDestinationId);
+                  setPendingDestinationId(null);
+                }}
+                className="rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                Change destination
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

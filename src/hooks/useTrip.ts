@@ -16,8 +16,30 @@ const initialState: TripState = {
 export function useTrip() {
   const [trip, setTrip] = useState<TripState>(initialState);
 
+  const hasDownstreamSelections = (state: TripState) =>
+    state.selectedLodgingId !== null ||
+    state.selectedActivityIds.length > 0 ||
+    state.selectedAddOnIds.length > 0;
+
   const setDestination = (id: string) =>
-    setTrip((prev) => ({ ...prev, selectedDestinationId: id, currentStep: "stay" }));
+    setTrip((prev) => {
+      if (id === prev.selectedDestinationId) {
+        return { ...prev, currentStep: "stay" };
+      }
+      return {
+        ...prev,
+        selectedDestinationId: id,
+        selectedLodgingId: null,
+        selectedActivityIds: [],
+        selectedAddOnIds: [],
+        currentStep: "stay",
+      };
+    });
+
+  const needsDestinationChangeConfirmation = (newId: string) =>
+    trip.selectedDestinationId !== null &&
+    trip.selectedDestinationId !== newId &&
+    hasDownstreamSelections(trip);
 
   const setLodging = (id: string) =>
     setTrip((prev) => ({ ...prev, selectedLodgingId: id }));
@@ -64,6 +86,7 @@ export function useTrip() {
   return {
     trip,
     setDestination,
+    needsDestinationChangeConfirmation,
     setLodging,
     setTravelers,
     setDates,
