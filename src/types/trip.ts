@@ -27,10 +27,12 @@ export interface Lodging {
   destinationId: string;
   name: string;
   shortDescription: string;
+  locationLabel: string;
   nightlyRate: number;
   maxGuests: number;
   amenities: string[];
   image: string;
+  mapPosition: { x: number; y: number };
 }
 
 export interface Activity {
@@ -50,6 +52,7 @@ export interface AddOn {
   name: string;
   shortDescription: string;
   price: number;
+  perPerson: boolean;
   category: string;
   tags: string[];
 }

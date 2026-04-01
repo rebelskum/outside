@@ -1,6 +1,8 @@
+import { useState } from "react";
 import type { TravelerGroup, DateRange } from "../../../types/trip";
 import { destinations } from "../../../data/mock/destinations";
 import { lodgings } from "../../../data/mock/lodgings";
+import { StayMap } from "../../../components/trip/StayMap";
 
 interface StayStepProps {
   destinationId: string;
@@ -23,6 +25,12 @@ export function StayStep({
 }: StayStepProps) {
   const destination = destinations.find((d) => d.id === destinationId);
   const available = lodgings.filter((l) => l.destinationId === destinationId);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  function handleSelect(lodgingId: string) {
+    onSelectLodging(lodgingId);
+    onNext();
+  }
 
   return (
     <div className="py-10 px-8">
@@ -44,15 +52,27 @@ export function StayStep({
 
       <h2 className="mt-10 text-lg font-medium">Choose your stay</h2>
 
-      <div className="mt-4 space-y-4">
+      {/* Area map */}
+      <div className="mt-4">
+        <StayMap
+          lodgings={available}
+          highlightedId={highlightedId}
+          onPinClick={handleSelect}
+        />
+      </div>
+
+      <div className="mt-6 space-y-4">
         {available.map((lodge) => (
           <button
             key={lodge.id}
-            onClick={() => {
-              onSelectLodging(lodge.id);
-              onNext();
-            }}
-            className="w-full rounded-xl border border-border bg-white p-5 text-left hover:border-brand/30 hover:shadow-sm transition-all"
+            onClick={() => handleSelect(lodge.id)}
+            onMouseEnter={() => setHighlightedId(lodge.id)}
+            onMouseLeave={() => setHighlightedId(null)}
+            className={`w-full rounded-xl border bg-white p-5 text-left transition-all ${
+              highlightedId === lodge.id
+                ? "border-brand/30 shadow-sm"
+                : "border-border hover:border-brand/30 hover:shadow-sm"
+            }`}
           >
             <div className="flex gap-5">
               <div className="h-20 w-28 shrink-0 rounded-lg bg-gray-100 flex items-center justify-center text-muted text-xs">
@@ -61,7 +81,11 @@ export function StayStep({
               <div>
                 <p className="font-medium">{lodge.name}</p>
                 <p className="text-sm text-muted mt-1">{lodge.shortDescription}</p>
-                <p className="text-sm font-medium mt-2">${lodge.nightlyRate} / night</p>
+                <div className="flex items-center gap-3 mt-2">
+                  <p className="text-sm font-medium">${lodge.nightlyRate} / night</p>
+                  <span className="text-xs text-muted/70">·</span>
+                  <span className="text-xs text-muted">{lodge.locationLabel}</span>
+                </div>
               </div>
             </div>
           </button>

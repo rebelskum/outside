@@ -2,7 +2,7 @@ import type { TripState, Participation } from "../../../types/trip";
 import { addOns } from "../../../data/mock/addons";
 import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
 
-const PARTICIPATION_CATEGORIES = new Set(["Dining", "Family"]);
+const PARTICIPATION_CATEGORIES = new Set(["Dining", "Family", "Gear"]);
 
 interface ExtrasStepProps {
   trip: TripState;
@@ -62,7 +62,9 @@ export function ExtrasStep({
                   </div>
                   <div className="flex items-center gap-3">
                     {addon.price > 0 && (
-                      <span className="text-sm text-muted">${addon.price}</span>
+                      <span className="text-sm text-muted">
+                        ${addon.price}{addon.perPerson ? "/person" : ""}
+                      </span>
                     )}
                     <span className={`text-sm ${selected ? "text-brand" : "text-muted"}`}>
                       {selected ? "✓" : "+"}

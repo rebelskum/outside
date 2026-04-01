@@ -3,8 +3,8 @@ import { destinations } from "../../../data/mock/destinations";
 import { lodgings } from "../../../data/mock/lodgings";
 import { activities } from "../../../data/mock/activities";
 import { addOns } from "../../../data/mock/addons";
-import { calculateTotal } from "../../../domain/services/pricing";
-import { formatCurrency, formatParticipation } from "../../../utils/format";
+import { calculateTotal, getBundleDiscount } from "../../../domain/services/pricing";
+import { formatCurrency, formatParticipation, participantCount } from "../../../utils/format";
 
 interface ReviewStepProps {
   trip: TripState;
@@ -15,6 +15,7 @@ export function ReviewStep({ trip, onBack }: ReviewStepProps) {
   const destination = destinations.find((d) => d.id === trip.selectedDestinationId);
   const lodging = lodgings.find((l) => l.id === trip.selectedLodgingId);
   const total = calculateTotal(trip);
+  const discount = getBundleDiscount(trip);
 
   return (
     <div className="py-10 px-8">
@@ -74,12 +75,17 @@ export function ReviewStep({ trip, onBack }: ReviewStepProps) {
                 const addOn = addOns.find((a) => a.id === item.id);
                 if (!addOn) return null;
                 const who = formatParticipation(item.participation, trip.travelers);
+                const count = participantCount(item.participation, trip.travelers);
                 return (
                   <li key={item.id} className="text-sm">
                     <div className="flex justify-between">
                       <span className="font-medium">{addOn.name}</span>
                       <span className="text-muted">
-                        {addOn.price > 0 ? formatCurrency(addOn.price) : "Included"}
+                        {addOn.price > 0
+                          ? addOn.perPerson
+                            ? `${formatCurrency(addOn.price)}/person × ${count}`
+                            : formatCurrency(addOn.price)
+                          : "Included"}
                       </span>
                     </div>
                     <p className="text-muted mt-0.5">{who}</p>
@@ -89,6 +95,13 @@ export function ReviewStep({ trip, onBack }: ReviewStepProps) {
             </ul>
           ) : (
             <p className="text-sm text-muted">No extras selected</p>
+          )}
+
+          {discount > 0 && (
+            <div className="mt-3 pt-3 border-t border-border/50 flex justify-between text-sm">
+              <span className="text-emerald-600 font-medium">Bundle discount</span>
+              <span className="text-emerald-600">−{formatCurrency(discount)}</span>
+            </div>
           )}
         </section>
       </div>

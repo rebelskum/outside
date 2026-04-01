@@ -62,6 +62,7 @@ export function TripBuilderPage() {
             onToggleActivity={toggleActivity}
             onUpdateActivityParticipation={updateActivityParticipation}
             onToggleAddOn={toggleAddOn}
+            onUpdateAddOnParticipation={updateAddOnParticipation}
             onBack={prevStep}
             onNext={nextStep}
           />

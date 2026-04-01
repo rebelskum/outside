@@ -12,6 +12,7 @@ interface ActivitiesStepProps {
   onToggleActivity: (activityId: string) => void;
   onUpdateActivityParticipation: (id: string, participation: Participation) => void;
   onToggleAddOn: (addOnId: string) => void;
+  onUpdateAddOnParticipation: (id: string, participation: Participation) => void;
   onBack: () => void;
   onNext: () => void;
 }
@@ -23,6 +24,7 @@ export function ActivitiesStep({
   onToggleActivity,
   onUpdateActivityParticipation,
   onToggleAddOn,
+  onUpdateAddOnParticipation,
   onBack,
   onNext,
 }: ActivitiesStepProps) {
@@ -46,10 +48,13 @@ export function ActivitiesStep({
         <RecommendationCard
           recommendation={recommendation}
           destinationId={destinationId}
+          trip={trip}
           selectedActivityIds={selectedActivityIds}
           selectedAddOnIds={selectedAddOnIds}
           onToggleActivity={onToggleActivity}
+          onUpdateActivityParticipation={onUpdateActivityParticipation}
           onToggleAddOn={onToggleAddOn}
+          onUpdateAddOnParticipation={onUpdateAddOnParticipation}
         />
       )}
 
@@ -121,17 +126,23 @@ export function ActivitiesStep({
 function RecommendationCard({
   recommendation,
   destinationId,
+  trip,
   selectedActivityIds,
   selectedAddOnIds,
   onToggleActivity,
+  onUpdateActivityParticipation,
   onToggleAddOn,
+  onUpdateAddOnParticipation,
 }: {
   recommendation: Recommendation;
   destinationId: string;
+  trip: TripState;
   selectedActivityIds: string[];
   selectedAddOnIds: string[];
   onToggleActivity: (id: string) => void;
+  onUpdateActivityParticipation: (id: string, participation: Participation) => void;
   onToggleAddOn: (id: string) => void;
+  onUpdateAddOnParticipation: (id: string, participation: Participation) => void;
 }) {
   const relevantActivityIds = recommendation.activityIds.filter((id) => {
     const activity = activities.find((a) => a.id === id);
@@ -151,6 +162,22 @@ function RecommendationCard({
     }
   };
 
+  // Use the first bundle activity's participation as the shared participation state
+  const bundleItem = relevantActivityIds.length > 0
+    ? trip.selectedActivities.find((a) => a.id === relevantActivityIds[0])
+    : null;
+
+  const handleBundleParticipation = (p: Participation) => {
+    for (const id of relevantActivityIds) {
+      onUpdateActivityParticipation(id, p);
+    }
+    for (const id of recommendation.addOnIds) {
+      if (selectedAddOnIds.includes(id)) {
+        onUpdateAddOnParticipation(id, p);
+      }
+    }
+  };
+
   return (
     <div className="mt-8 rounded-2xl border border-brand/10 bg-brand/[0.02] p-6">
       <p className="text-xs font-medium uppercase tracking-wide text-muted mb-2">
@@ -164,7 +191,7 @@ function RecommendationCard({
       <div className="mt-4 flex items-center gap-4">
         {recommendation.bundlePrice && (
           <span className="text-sm font-medium">
-            {formatCurrency(recommendation.bundlePrice)}
+            {formatCurrency(recommendation.bundlePrice)}/person
           </span>
         )}
         {recommendation.savings > 0 && (
@@ -174,17 +201,25 @@ function RecommendationCard({
         )}
       </div>
 
-      <button
-        onClick={handleAdd}
-        disabled={allAlreadyAdded}
-        className={`mt-4 rounded-lg px-5 py-2.5 text-sm font-medium transition-opacity ${
-          allAlreadyAdded
-            ? "bg-brand/5 text-muted cursor-default"
-            : "bg-brand text-white hover:opacity-90"
-        }`}
-      >
-        {allAlreadyAdded ? "✓ Added to trip" : "Add to trip"}
-      </button>
+      {!allAlreadyAdded && (
+        <button
+          onClick={handleAdd}
+          className="mt-4 rounded-lg px-5 py-2.5 text-sm font-medium bg-brand text-white hover:opacity-90 transition-opacity"
+        >
+          Add to trip
+        </button>
+      )}
+
+      {allAlreadyAdded && bundleItem && (
+        <div className="mt-4 flex items-center gap-4">
+          <span className="text-sm text-brand font-medium">✓ Added</span>
+          <ParticipationPicker
+            participation={bundleItem.participation}
+            travelers={trip.travelers}
+            onChange={handleBundleParticipation}
+          />
+        </div>
+      )}
     </div>
   );
 }
