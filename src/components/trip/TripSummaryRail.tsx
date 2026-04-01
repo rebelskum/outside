@@ -4,7 +4,7 @@ import { lodgings } from "../../data/mock/lodgings";
 import { activities } from "../../data/mock/activities";
 import { addOns } from "../../data/mock/addons";
 import { calculateTotal } from "../../domain/services/pricing";
-import { formatCurrency } from "../../utils/format";
+import { formatCurrency, formatParticipation } from "../../utils/format";
 
 interface TripSummaryRailProps {
   trip: TripState;
@@ -14,8 +14,6 @@ interface TripSummaryRailProps {
 export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
   const destination = destinations.find((d) => d.id === trip.selectedDestinationId);
   const lodging = lodgings.find((l) => l.id === trip.selectedLodgingId);
-  const selectedActivities = activities.filter((a) => trip.selectedActivityIds.includes(a.id));
-  const selectedAddOns = addOns.filter((a) => trip.selectedAddOnIds.includes(a.id));
   const total = calculateTotal(trip);
 
   return (
@@ -35,20 +33,44 @@ export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
 
           <div className="border-t border-border pt-3 mt-3">
             <p className="font-medium text-brand">Activities</p>
-            <p>
-              {selectedActivities.length > 0
-                ? selectedActivities.map((a) => a.name).join(", ")
-                : "—"}
-            </p>
+            {trip.selectedActivities.length > 0 ? (
+              <ul className="space-y-1 mt-1">
+                {trip.selectedActivities.map((item) => {
+                  const activity = activities.find((a) => a.id === item.id);
+                  if (!activity) return null;
+                  const who = formatParticipation(item.participation, trip.travelers);
+                  return (
+                    <li key={item.id}>
+                      <span>{activity.name}</span>
+                      <span className="text-muted/60"> · {who}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p>—</p>
+            )}
           </div>
 
           <div className="border-t border-border pt-3 mt-3">
             <p className="font-medium text-brand">Extras</p>
-            <p>
-              {selectedAddOns.length > 0
-                ? selectedAddOns.map((a) => a.name).join(", ")
-                : "—"}
-            </p>
+            {trip.selectedAddOns.length > 0 ? (
+              <ul className="space-y-1 mt-1">
+                {trip.selectedAddOns.map((item) => {
+                  const addOn = addOns.find((a) => a.id === item.id);
+                  if (!addOn) return null;
+                  const who = formatParticipation(item.participation, trip.travelers);
+                  return (
+                    <li key={item.id}>
+                      <span>{addOn.name}</span>
+                      <span className="text-muted/60"> · {who}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p>—</p>
+            )}
           </div>
         </div>
 

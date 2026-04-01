@@ -1,12 +1,16 @@
-import type { TripState, Recommendation } from "../../../types/trip";
+import type { TripState, Recommendation, Participation } from "../../../types/trip";
 import { destinations } from "../../../data/mock/destinations";
 import { activities } from "../../../data/mock/activities";
 import { getRecommendations } from "../../../domain/services/recommendations";
 import { formatCurrency } from "../../../utils/format";
+import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
 
 interface ActivitiesStepProps {
   trip: TripState;
+  selectedActivityIds: string[];
+  selectedAddOnIds: string[];
   onToggleActivity: (activityId: string) => void;
+  onUpdateActivityParticipation: (id: string, participation: Participation) => void;
   onToggleAddOn: (addOnId: string) => void;
   onBack: () => void;
   onNext: () => void;
@@ -14,7 +18,10 @@ interface ActivitiesStepProps {
 
 export function ActivitiesStep({
   trip,
+  selectedActivityIds,
+  selectedAddOnIds,
   onToggleActivity,
+  onUpdateActivityParticipation,
   onToggleAddOn,
   onBack,
   onNext,
@@ -39,8 +46,8 @@ export function ActivitiesStep({
         <RecommendationCard
           recommendation={recommendation}
           destinationId={destinationId}
-          selectedActivityIds={trip.selectedActivityIds}
-          selectedAddOnIds={trip.selectedAddOnIds}
+          selectedActivityIds={selectedActivityIds}
+          selectedAddOnIds={selectedAddOnIds}
           onToggleActivity={onToggleActivity}
           onToggleAddOn={onToggleAddOn}
         />
@@ -50,30 +57,45 @@ export function ActivitiesStep({
 
       <div className="mt-4 space-y-3">
         {available.map((activity) => {
-          const selected = trip.selectedActivityIds.includes(activity.id);
+          const selected = selectedActivityIds.includes(activity.id);
+          const selectedItem = trip.selectedActivities.find((a) => a.id === activity.id);
           return (
-            <button
+            <div
               key={activity.id}
-              onClick={() => onToggleActivity(activity.id)}
-              className={`w-full rounded-xl border p-5 text-left transition-all ${
+              className={`rounded-xl border p-5 transition-all ${
                 selected
                   ? "border-brand bg-brand/[0.03]"
                   : "border-border bg-white hover:border-brand/30 hover:shadow-sm"
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">{activity.name}</p>
-                  <p className="text-sm text-muted mt-1">{activity.shortDescription}</p>
-                  <p className="text-xs text-muted mt-1">
-                    {activity.duration} · ${activity.price}/person
-                  </p>
+              <button
+                onClick={() => onToggleActivity(activity.id)}
+                className="w-full text-left"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{activity.name}</p>
+                    <p className="text-sm text-muted mt-1">{activity.shortDescription}</p>
+                    <p className="text-xs text-muted mt-1">
+                      {activity.duration} · ${activity.price}/person
+                    </p>
+                  </div>
+                  <span className={`text-sm ${selected ? "text-brand" : "text-muted"}`}>
+                    {selected ? "✓ Added" : "+ Add"}
+                  </span>
                 </div>
-                <span className={`text-sm ${selected ? "text-brand" : "text-muted"}`}>
-                  {selected ? "✓ Added" : "+ Add"}
-                </span>
-              </div>
-            </button>
+              </button>
+
+              {selected && selectedItem && (
+                <div className="mt-3 pt-3 border-t border-border/50">
+                  <ParticipationPicker
+                    participation={selectedItem.participation}
+                    travelers={trip.travelers}
+                    onChange={(p) => onUpdateActivityParticipation(activity.id, p)}
+                  />
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

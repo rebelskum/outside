@@ -13,13 +13,17 @@ import { ReviewStep } from "./steps/ReviewStep";
 export function TripBuilderPage() {
   const {
     trip,
+    selectedActivityIds,
+    selectedAddOnIds,
     setDestination,
     needsDestinationChangeConfirmation,
     setLodging,
     setTravelers,
     setDates,
     toggleActivity,
+    updateActivityParticipation,
     toggleAddOn,
+    updateAddOnParticipation,
     nextStep,
     prevStep,
   } = useTrip();
@@ -53,7 +57,10 @@ export function TripBuilderPage() {
         return (
           <ActivitiesStep
             trip={trip}
+            selectedActivityIds={selectedActivityIds}
+            selectedAddOnIds={selectedAddOnIds}
             onToggleActivity={toggleActivity}
+            onUpdateActivityParticipation={updateActivityParticipation}
             onToggleAddOn={toggleAddOn}
             onBack={prevStep}
             onNext={nextStep}
@@ -62,8 +69,10 @@ export function TripBuilderPage() {
       case "extras":
         return (
           <ExtrasStep
-            selectedAddOnIds={trip.selectedAddOnIds}
+            trip={trip}
+            selectedAddOnIds={selectedAddOnIds}
             onToggleAddOn={toggleAddOn}
+            onUpdateAddOnParticipation={updateAddOnParticipation}
             onBack={prevStep}
             onNext={nextStep}
           />

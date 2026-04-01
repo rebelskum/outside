@@ -68,12 +68,25 @@ export interface Recommendation {
   savings: number;
 }
 
+export type ParticipationType = "everyone" | "partial";
+
+export interface Participation {
+  type: ParticipationType;
+  adults: number;
+  kids: number;
+}
+
+export interface SelectedItem {
+  id: string;
+  participation: Participation;
+}
+
 export interface TripState {
   currentStep: StepId;
   selectedDestinationId: string | null;
   dateRange: DateRange;
   travelers: TravelerGroup;
   selectedLodgingId: string | null;
-  selectedActivityIds: string[];
-  selectedAddOnIds: string[];
+  selectedActivities: SelectedItem[];
+  selectedAddOns: SelectedItem[];
 }

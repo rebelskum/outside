@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { TripState, StepId, TravelerGroup, DateRange } from "../types/trip";
+import type { TripState, StepId, TravelerGroup, DateRange, Participation, SelectedItem } from "../types/trip";
 
 const STEP_ORDER: StepId[] = ["destination", "stay", "activities", "extras", "review"];
 
@@ -9,17 +9,21 @@ const initialState: TripState = {
   dateRange: { start: "Mar 14", end: "Mar 16" },
   travelers: { adults: 2, children: 0 },
   selectedLodgingId: null,
-  selectedActivityIds: [],
-  selectedAddOnIds: [],
+  selectedActivities: [],
+  selectedAddOns: [],
 };
+
+function defaultParticipation(travelers: TravelerGroup): Participation {
+  return { type: "everyone", adults: travelers.adults, kids: travelers.children };
+}
 
 export function useTrip() {
   const [trip, setTrip] = useState<TripState>(initialState);
 
   const hasDownstreamSelections = (state: TripState) =>
     state.selectedLodgingId !== null ||
-    state.selectedActivityIds.length > 0 ||
-    state.selectedAddOnIds.length > 0;
+    state.selectedActivities.length > 0 ||
+    state.selectedAddOns.length > 0;
 
   const setDestination = (id: string) =>
     setTrip((prev) => {
@@ -30,8 +34,8 @@ export function useTrip() {
         ...prev,
         selectedDestinationId: id,
         selectedLodgingId: null,
-        selectedActivityIds: [],
-        selectedAddOnIds: [],
+        selectedActivities: [],
+        selectedAddOns: [],
         currentStep: "stay",
       };
     });
@@ -51,20 +55,51 @@ export function useTrip() {
     setTrip((prev) => ({ ...prev, dateRange }));
 
   const toggleActivity = (id: string) =>
+    setTrip((prev) => {
+      const exists = prev.selectedActivities.find((a) => a.id === id);
+      return {
+        ...prev,
+        selectedActivities: exists
+          ? prev.selectedActivities.filter((a) => a.id !== id)
+          : [...prev.selectedActivities, { id, participation: defaultParticipation(prev.travelers) }],
+      };
+    });
+
+  const updateActivityParticipation = (id: string, participation: Participation) =>
     setTrip((prev) => ({
       ...prev,
-      selectedActivityIds: prev.selectedActivityIds.includes(id)
-        ? prev.selectedActivityIds.filter((a) => a !== id)
-        : [...prev.selectedActivityIds, id],
+      selectedActivities: prev.selectedActivities.map((a) =>
+        a.id === id ? { ...a, participation } : a
+      ),
     }));
 
   const toggleAddOn = (id: string) =>
+    setTrip((prev) => {
+      const exists = prev.selectedAddOns.find((a) => a.id === id);
+      return {
+        ...prev,
+        selectedAddOns: exists
+          ? prev.selectedAddOns.filter((a) => a.id !== id)
+          : [...prev.selectedAddOns, { id, participation: defaultParticipation(prev.travelers) }],
+      };
+    });
+
+  const updateAddOnParticipation = (id: string, participation: Participation) =>
     setTrip((prev) => ({
       ...prev,
-      selectedAddOnIds: prev.selectedAddOnIds.includes(id)
-        ? prev.selectedAddOnIds.filter((a) => a !== id)
-        : [...prev.selectedAddOnIds, id],
+      selectedAddOns: prev.selectedAddOns.map((a) =>
+        a.id === id ? { ...a, participation } : a
+      ),
     }));
+
+  const selectedActivityIds = trip.selectedActivities.map((a) => a.id);
+  const selectedAddOnIds = trip.selectedAddOns.map((a) => a.id);
+
+  const findActivity = (id: string): SelectedItem | undefined =>
+    trip.selectedActivities.find((a) => a.id === id);
+
+  const findAddOn = (id: string): SelectedItem | undefined =>
+    trip.selectedAddOns.find((a) => a.id === id);
 
   const goToStep = (step: StepId) =>
     setTrip((prev) => ({ ...prev, currentStep: step }));
@@ -85,13 +120,19 @@ export function useTrip() {
 
   return {
     trip,
+    selectedActivityIds,
+    selectedAddOnIds,
+    findActivity,
+    findAddOn,
     setDestination,
     needsDestinationChangeConfirmation,
     setLodging,
     setTravelers,
     setDates,
     toggleActivity,
+    updateActivityParticipation,
     toggleAddOn,
+    updateAddOnParticipation,
     goToStep,
     nextStep,
     prevStep,

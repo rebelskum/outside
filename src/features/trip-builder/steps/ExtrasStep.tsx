@@ -1,18 +1,32 @@
+import type { TripState, Participation } from "../../../types/trip";
 import { addOns } from "../../../data/mock/addons";
+import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
+
+const PARTICIPATION_CATEGORIES = new Set(["Dining", "Family"]);
 
 interface ExtrasStepProps {
+  trip: TripState;
   selectedAddOnIds: string[];
   onToggleAddOn: (addOnId: string) => void;
+  onUpdateAddOnParticipation: (id: string, participation: Participation) => void;
   onBack: () => void;
   onNext: () => void;
 }
 
 export function ExtrasStep({
+  trip,
   selectedAddOnIds,
   onToggleAddOn,
+  onUpdateAddOnParticipation,
   onBack,
   onNext,
 }: ExtrasStepProps) {
+  const destinationId = trip.selectedDestinationId!;
+  const globalAddOns = addOns.filter((a) => a.destinationId === null);
+  const diningAddOns = addOns.filter(
+    (a) => a.destinationId === destinationId && a.category === "Dining"
+  );
+
   return (
     <div className="py-10 px-8">
       <h1 className="text-2xl font-semibold tracking-tight">
@@ -23,42 +37,111 @@ export function ExtrasStep({
       </p>
 
       <div className="mt-8 space-y-3">
-        {addOns.map((addon) => {
+        {globalAddOns.map((addon) => {
           const selected = selectedAddOnIds.includes(addon.id);
+          const selectedItem = trip.selectedAddOns.find((a) => a.id === addon.id);
+          const showParticipation = selected && selectedItem && PARTICIPATION_CATEGORIES.has(addon.category);
+
           return (
-            <button
+            <div
               key={addon.id}
-              onClick={() => onToggleAddOn(addon.id)}
-              className={`w-full rounded-xl border p-5 text-left transition-all ${
+              className={`rounded-xl border p-5 transition-all ${
                 selected
                   ? "border-brand bg-brand/[0.03]"
                   : "border-border bg-white hover:border-brand/30 hover:shadow-sm"
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">{addon.name}</p>
-                  <p className="text-sm text-muted mt-1">{addon.shortDescription}</p>
+              <button
+                onClick={() => onToggleAddOn(addon.id)}
+                className="w-full text-left"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{addon.name}</p>
+                    <p className="text-sm text-muted mt-1">{addon.shortDescription}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {addon.price > 0 && (
+                      <span className="text-sm text-muted">${addon.price}</span>
+                    )}
+                    <span className={`text-sm ${selected ? "text-brand" : "text-muted"}`}>
+                      {selected ? "✓" : "+"}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  {addon.price > 0 && (
-                    <span className="text-sm text-muted">${addon.price}</span>
-                  )}
-                  <span className={`text-sm ${selected ? "text-brand" : "text-muted"}`}>
-                    {selected ? "✓" : "+"}
-                  </span>
+              </button>
+
+              {showParticipation && (
+                <div className="mt-3 pt-3 border-t border-border/50">
+                  <ParticipationPicker
+                    participation={selectedItem.participation}
+                    travelers={trip.travelers}
+                    onChange={(p) => onUpdateAddOnParticipation(addon.id, p)}
+                  />
                 </div>
-              </div>
-            </button>
+              )}
+            </div>
           );
         })}
       </div>
 
-      <div className="mt-6 rounded-xl border border-dashed border-brand/20 bg-brand/[0.02] p-5">
-        <p className="text-sm text-muted">
-          Contextual nudge placeholder — suggestions based on your trip will appear here
-        </p>
-      </div>
+      {diningAddOns.length > 0 && (
+        <>
+          <h2 className="mt-10 text-lg font-medium">Dinner reservations</h2>
+          <p className="mt-1 text-sm text-muted">
+            Complimentary reservation at nearby restaurants
+          </p>
+
+          <div className="mt-4 space-y-3">
+            {diningAddOns.map((addon) => {
+              const selected = selectedAddOnIds.includes(addon.id);
+              const selectedItem = trip.selectedAddOns.find((a) => a.id === addon.id);
+              const priceRange = addon.tags.find((t) => /^\$+$/.test(t));
+
+              return (
+                <div
+                  key={addon.id}
+                  className={`rounded-xl border p-5 transition-all ${
+                    selected
+                      ? "border-brand bg-brand/[0.03]"
+                      : "border-border bg-white hover:border-brand/30 hover:shadow-sm"
+                  }`}
+                >
+                  <button
+                    onClick={() => onToggleAddOn(addon.id)}
+                    className="w-full text-left"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{addon.name}</p>
+                        <p className="text-sm text-muted mt-1">{addon.shortDescription}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {priceRange && (
+                          <span className="text-sm text-muted">{priceRange}</span>
+                        )}
+                        <span className={`text-sm ${selected ? "text-brand" : "text-muted"}`}>
+                          {selected ? "✓" : "+"}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+
+                  {selected && selectedItem && (
+                    <div className="mt-3 pt-3 border-t border-border/50">
+                      <ParticipationPicker
+                        participation={selectedItem.participation}
+                        travelers={trip.travelers}
+                        onChange={(p) => onUpdateAddOnParticipation(addon.id, p)}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <div className="mt-10 flex justify-between">
         <button
