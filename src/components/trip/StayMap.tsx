@@ -4,9 +4,10 @@ interface StayMapProps {
   lodgings: Lodging[];
   highlightedId: string | null;
   onPinClick: (lodgingId: string) => void;
+  onPinHover?: (lodgingId: string | null) => void;
 }
 
-export function StayMap({ lodgings, highlightedId, onPinClick }: StayMapProps) {
+export function StayMap({ lodgings, highlightedId, onPinClick, onPinHover }: StayMapProps) {
   return (
     <div className="relative w-full h-48 rounded-xl bg-[#f0eeeb] border border-border overflow-hidden select-none">
       {/* Stylized terrain lines */}
@@ -49,6 +50,8 @@ export function StayMap({ lodgings, highlightedId, onPinClick }: StayMapProps) {
           <button
             key={lodge.id}
             onClick={() => onPinClick(lodge.id)}
+            onMouseEnter={() => onPinHover?.(lodge.id)}
+            onMouseLeave={() => onPinHover?.(null)}
             className="absolute -translate-x-1/2 -translate-y-full group focus:outline-none"
             style={{
               left: `${lodge.mapPosition.x}%`,

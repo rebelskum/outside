@@ -10,6 +10,7 @@ import { StepActions } from "../../../components/shared/StepActions";
 
 interface StayStepProps {
   destinationId: string;
+  selectedLodgingId: string | null;
   travelers: TravelerGroup;
   dates: DateRange;
   onSelectLodging: (lodgingId: string) => void;
@@ -21,6 +22,7 @@ interface StayStepProps {
 
 export function StayStep({
   destinationId,
+  selectedLodgingId,
   travelers,
   dates,
   onSelectLodging,
@@ -33,13 +35,21 @@ export function StayStep({
   const available = getLodgingsForDestination(destinationId);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
+  const activeId = highlightedId ?? selectedLodgingId;
+
   useEffect(() => {
     preloadImages(available.map((l) => l.image));
   }, [destinationId]);
 
-  function handleSelect(lodgingId: string) {
-    onSelectLodging(lodgingId);
-    onNext();
+  function cardStyle(lodgeId: string) {
+    const isSelected = selectedLodgingId === lodgeId;
+    const isActive = activeId === lodgeId;
+
+    if (isSelected)
+      return "border-brand bg-brand/[0.03]";
+    if (isActive)
+      return "bg-white border-brand/30 shadow-sm";
+    return "bg-white border-border hover:border-brand/30 hover:shadow-sm";
   }
 
   return (
@@ -60,8 +70,9 @@ export function StayStep({
       <div className="mt-4">
         <StayMap
           lodgings={available}
-          highlightedId={highlightedId}
-          onPinClick={handleSelect}
+          highlightedId={activeId}
+          onPinClick={onSelectLodging}
+          onPinHover={setHighlightedId}
         />
       </div>
 
@@ -69,14 +80,10 @@ export function StayStep({
         {available.map((lodge) => (
           <button
             key={lodge.id}
-            onClick={() => handleSelect(lodge.id)}
+            onClick={() => onSelectLodging(lodge.id)}
             onMouseEnter={() => setHighlightedId(lodge.id)}
             onMouseLeave={() => setHighlightedId(null)}
-            className={`w-full rounded-xl border bg-white p-5 text-left transition-all ${
-              highlightedId === lodge.id
-                ? "border-brand/30 shadow-sm"
-                : "border-border hover:border-brand/30 hover:shadow-sm"
-            }`}
+            className={`w-full rounded-xl border p-5 text-left transition-all ${cardStyle(lodge.id)}`}
           >
             <div className="flex gap-5">
               <OptimizedImage
@@ -84,7 +91,7 @@ export function StayStep({
                 alt={lodge.name}
                 className="h-20 w-28 shrink-0 rounded-lg"
               />
-              <div>
+              <div className="flex-1">
                 <p className="font-medium">{lodge.name}</p>
                 <p className="text-sm text-muted mt-1">{lodge.shortDescription}</p>
                 <div className="flex items-center gap-3 mt-2">
@@ -98,7 +105,7 @@ export function StayStep({
         ))}
       </div>
 
-      <StepActions onBack={onBack} onNext={onNext} />
+      <StepActions onBack={onBack} onNext={onNext} nextDisabled={!selectedLodgingId} />
     </div>
   );
 }

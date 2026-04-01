@@ -45,6 +45,7 @@ export function TripBuilderPage() {
         return (
           <StayStep
             destinationId={trip.selectedDestinationId!}
+            selectedLodgingId={trip.selectedLodgingId}
             travelers={trip.travelers}
             dates={trip.dateRange}
             onSelectLodging={setLodging}
