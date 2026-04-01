@@ -3,6 +3,7 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --color-brand: #1a1a1a;
+  --color-highlight: var(--color-red-500);
   --color-accent: #ffd204;
   --color-muted: #6b7280;
   --color-surface: #fafaf9;

@@ -22,11 +22,14 @@ export function ProgressNav({ currentStep }: ProgressNavProps) {
       {STEPS.map((step, index) => (
         <div key={step.id} className="flex items-center gap-2">
           <span
-            className={`text-sm ${
+            className={`relative text-sm pb-2 ${
               index <= currentIndex ? "text-brand font-medium" : "text-muted"
             }`}
           >
             {step.label}
+            {index === currentIndex && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-highlight rounded-full" />
+            )}
           </span>
           {index < STEPS.length - 1 && (
             <span className="text-border">·</span>
