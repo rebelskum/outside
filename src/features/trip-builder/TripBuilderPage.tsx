@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { useTrip } from "../../hooks/useTrip";
 import { calculateTotal } from "../../domain/services/pricing";
 import { Header } from "../../components/layout/Header";
+import { Footer } from "../../components/layout/Footer";
 import { ProgressNav } from "../../components/layout/ProgressNav";
 import { TripSummaryRail } from "../../components/trip/TripSummaryRail";
 import { MobileSummaryBar } from "../../components/trip/MobileSummaryBar";
@@ -97,12 +99,36 @@ export function TripBuilderPage() {
     }
   };
 
+  const isDestinationStep = trip.currentStep === "destination";
+
+  const heroImage = useMemo(() => {
+    const heroes = [
+      "/hero-destination.jpg",
+      "/hero-coast.jpg",
+      "/hero-desert.jpg",
+    ];
+    return heroes[Math.floor(Math.random() * heroes.length)];
+  }, []);
+
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="relative min-h-screen bg-surface">
+      {/* Full-width hero image behind destination card */}
+      {isDestinationStep && (
+        <div className="absolute inset-x-0 top-0 -z-0 h-[calc(100vh-96px)] overflow-hidden">
+          <img
+            src={heroImage}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent via-80% to-surface" />
+        </div>
+      )}
+
+      <div className="relative z-10 flex flex-col min-h-screen">
       <Header />
       {showSummary && <ProgressNav currentStep={trip.currentStep} onStepClick={goToStep} />}
 
-      <div className="mx-auto max-w-6xl px-6 pb-28 lg:pb-8">
+      <div className="flex-1 mx-auto max-w-6xl w-full px-6 pb-28 lg:pb-8">
         <div className="flex gap-12">
           <main className="flex-1 min-w-0">{stepContent()}</main>
 
@@ -115,6 +141,9 @@ export function TripBuilderPage() {
       {showSummary && (
         <MobileSummaryBar total={total} onViewTrip={() => {}} />
       )}
+
+      <Footer />
+      </div>
     </div>
   );
 }

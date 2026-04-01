@@ -42,9 +42,6 @@ export function DestinationStep({ onSelect, needsConfirmation }: DestinationStep
 
   return (
     <div className="relative flex flex-col items-center px-4 sm:px-8 pt-16 sm:pt-24 pb-16">
-      {/* Hero image slot — add a background image to this container */}
-      {/* <div className="absolute inset-0 -z-10 bg-cover bg-center" style={{ backgroundImage: "url(...)" }} /> */}
-
       {/* Destination card */}
       <div className="w-full max-w-3xl rounded-3xl bg-white/95 backdrop-blur-sm shadow-lg border border-border/50 px-8 sm:px-16 py-16 sm:py-20 flex flex-col items-center">
         <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-center">
@@ -88,7 +85,7 @@ export function DestinationStep({ onSelect, needsConfirmation }: DestinationStep
         {/* Divider */}
         {!showSearchResults && (
           <>
-            <p className="mt-8 text-md">or pick your vibe</p>
+            <p className="mt-8 text-md text-muted ">or pick your vibe</p>
 
             {/* Vibe cards */}
             <div className="mt-6 grid grid-cols-3 gap-4 w-full max-w-lg">

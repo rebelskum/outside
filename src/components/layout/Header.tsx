@@ -1,6 +1,8 @@
 export function Header() {
   return (
-    <header className="flex items-center justify-between px-8 py-3 border-b border-border">
+    <>
+    <div className="h-1 bg-accent" />
+    <header className="flex items-center justify-between px-8 py-3 border-b border-border bg-surface">
       <div className="flex items-center gap-2">
         <img src="/suitcase.svg" alt="" className="h-10 w-10" />
         <div className="flex flex-col items-start leading-none">
@@ -9,5 +11,6 @@ export function Header() {
         </div>
       </div>
     </header>
+    </>
   );
 }
