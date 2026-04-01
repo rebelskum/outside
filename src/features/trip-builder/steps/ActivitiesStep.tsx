@@ -14,6 +14,7 @@ interface ActivitiesStepProps {
   onUpdateActivityParticipation: (id: string, participation: Participation) => void;
   onToggleAddOn: (addOnId: string) => void;
   onUpdateAddOnParticipation: (id: string, participation: Participation) => void;
+  onMarkRecommendationSeen: (id: string) => void;
   onBack: () => void;
   onNext: () => void;
 }
@@ -24,6 +25,7 @@ export function ActivitiesStep({
   onUpdateActivityParticipation,
   onToggleAddOn,
   onUpdateAddOnParticipation,
+  onMarkRecommendationSeen,
   onBack,
   onNext,
 }: ActivitiesStepProps) {
@@ -54,6 +56,7 @@ export function ActivitiesStep({
           onUpdateActivityParticipation={onUpdateActivityParticipation}
           onToggleAddOn={onToggleAddOn}
           onUpdateAddOnParticipation={onUpdateAddOnParticipation}
+          onMarkRecommendationSeen={onMarkRecommendationSeen}
         />
       )}
 
@@ -106,6 +109,7 @@ function RecommendationCard({
   onUpdateActivityParticipation,
   onToggleAddOn,
   onUpdateAddOnParticipation,
+  onMarkRecommendationSeen,
 }: {
   recommendation: Recommendation;
   destinationId: string;
@@ -116,6 +120,7 @@ function RecommendationCard({
   onUpdateActivityParticipation: (id: string, participation: Participation) => void;
   onToggleAddOn: (id: string) => void;
   onUpdateAddOnParticipation: (id: string, participation: Participation) => void;
+  onMarkRecommendationSeen: (id: string) => void;
 }) {
   const relevantActivityIds = getRelevantActivityIds(recommendation, destinationId);
 
@@ -124,6 +129,7 @@ function RecommendationCard({
     recommendation.addOnIds.every((id) => selectedAddOnIds.includes(id));
 
   const handleAdd = () => {
+    onMarkRecommendationSeen(recommendation.id);
     for (const id of relevantActivityIds) {
       if (!selectedActivityIds.includes(id)) onToggleActivity(id);
     }

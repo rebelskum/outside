@@ -12,12 +12,16 @@ const initialState: TripState = {
   selectedLodgingId: null,
   selectedActivities: [],
   selectedAddOns: [],
+  seenRecommendationIds: [],
 };
 
 function loadState(): TripState {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored) as TripState;
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return { ...initialState, ...parsed } as TripState;
+    }
   } catch { /* ignore corrupt data */ }
   return initialState;
 }
@@ -62,6 +66,7 @@ export function useTrip() {
         selectedLodgingId: null,
         selectedActivities: [],
         selectedAddOns: [],
+        seenRecommendationIds: [],
         currentStep: "stay",
       };
     });
@@ -112,6 +117,13 @@ export function useTrip() {
       selectedAddOns: updateItemParticipation(prev.selectedAddOns, id, participation),
     }));
 
+  const markRecommendationSeen = (id: string) =>
+    setTrip((prev) =>
+      prev.seenRecommendationIds.includes(id)
+        ? prev
+        : { ...prev, seenRecommendationIds: [...prev.seenRecommendationIds, id] },
+    );
+
   const goToStep = (step: StepId) =>
     setTrip((prev) => ({ ...prev, currentStep: step }));
 
@@ -138,6 +150,7 @@ export function useTrip() {
     updateActivityParticipation,
     toggleAddOn,
     updateAddOnParticipation,
+    markRecommendationSeen,
     goToStep,
     nextStep,
     prevStep,

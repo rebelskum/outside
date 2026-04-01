@@ -11,6 +11,7 @@ export function getRecommendations(trip: TripState): Recommendation[] {
 
   return recommendations.filter((rec) => {
     if (!isRecommendationAllowed(rec, vibe)) return false;
+    if (trip.seenRecommendationIds.includes(rec.id)) return true;
     switch (rec.trigger.type) {
       case "activity_selected": {
         const selected = trip.selectedActivities

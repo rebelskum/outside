@@ -24,6 +24,7 @@ export function TripBuilderPage() {
     updateActivityParticipation,
     toggleAddOn,
     updateAddOnParticipation,
+    markRecommendationSeen,
     goToStep,
     nextStep,
     prevStep,
@@ -63,6 +64,7 @@ export function TripBuilderPage() {
             onUpdateActivityParticipation={updateActivityParticipation}
             onToggleAddOn={toggleAddOn}
             onUpdateAddOnParticipation={updateAddOnParticipation}
+            onMarkRecommendationSeen={markRecommendationSeen}
             onBack={prevStep}
             onNext={nextStep}
           />

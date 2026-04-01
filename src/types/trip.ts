@@ -92,4 +92,5 @@ export interface TripState {
   selectedLodgingId: string | null;
   selectedActivities: SelectedItem[];
   selectedAddOns: SelectedItem[];
+  seenRecommendationIds: string[];
 }
