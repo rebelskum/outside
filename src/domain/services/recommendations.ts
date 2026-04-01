@@ -23,6 +23,10 @@ export function getRecommendations(trip: TripState): Recommendation[] {
         return trip.travelers.children > 0;
       case "addon_selected":
         return selectedAddOnIds.includes(rec.trigger.value ?? "");
+      case "destination_vibe": {
+        const allowedVibes = (rec.trigger.value ?? "").split(",");
+        return vibe !== undefined && allowedVibes.includes(vibe);
+      }
       default:
         return false;
     }

@@ -41,7 +41,7 @@ function PencilIcon() {
 
 function BundleBadge({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-highlight px-2 py-0.5 text-[10px] font-medium tracking-wide text-white">
+    <span className="inline-flex items-center gap-1 rounded-full bg-bundle px-2 py-0.5 text-[10px] font-medium tracking-wide text-white">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
         <line x1="7" y1="7" x2="7.01" y2="7" />
@@ -253,8 +253,8 @@ export function ReviewStep({
 
           {discount > 0 && (
             <div className="mt-3 pt-3 border-t border-border/50 flex justify-between text-sm">
-              <span className="text-highlight font-medium">Bundle discount</span>
-              <span className="text-highlight">−{formatCurrency(discount)}</span>
+              <span className="text-bundle font-medium">Bundle discount</span>
+              <span className="text-bundle">−{formatCurrency(discount)}</span>
             </div>
           )}
         </section>

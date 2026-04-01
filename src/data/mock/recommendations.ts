@@ -31,4 +31,15 @@ export const recommendations: Recommendation[] = [
     bundlePrice: null,
     savings: 20,
   },
+  {
+    id: "breakfast-adventure",
+    title: "Breakfast & Adventure Bundle",
+    reason: "Start each day fueled up — bundle breakfast with any activity and save",
+    trigger: { type: "destination_vibe", value: "desert,coast" },
+    requiresActivity: true,
+    activityIds: [],
+    addOnIds: ["breakfast"],
+    bundlePrice: null,
+    savings: 10,
+  },
 ];

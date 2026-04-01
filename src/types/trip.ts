@@ -62,9 +62,10 @@ export interface Recommendation {
   title: string;
   reason: string;
   trigger: {
-    type: "activity_selected" | "has_children" | "addon_selected";
+    type: "activity_selected" | "has_children" | "addon_selected" | "destination_vibe";
     value: string | null;
   };
+  requiresActivity?: boolean;
   activityIds: string[];
   addOnIds: string[];
   bundlePrice: number | null;

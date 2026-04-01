@@ -38,6 +38,19 @@ export function ActivitiesStep({
   const recs = getRecommendations(trip);
   const recommendation = recs.length > 0 ? recs[0] : null;
 
+  // Check if any active recommendation with requiresActivity is missing an activity selection
+  const hasActivityRequirementViolation = recs.some((rec) => {
+    if (!rec.requiresActivity) return false;
+    const relevantIds = getRelevantActivityIds(rec, destinationId);
+    const recAddOnsSelected = rec.addOnIds.every((id) => selectedAddOnIds.includes(id));
+    const recActivitiesSelected = relevantIds.length > 0
+      ? relevantIds.every((id) => selectedActivityIds.includes(id))
+      : false;
+    // Bundle is considered "selected" when its add-ons are added
+    const bundleSelected = recAddOnsSelected && (rec.addOnIds.length > 0 || recActivitiesSelected);
+    return bundleSelected && selectedActivityIds.length === 0;
+  });
+
   return (
     <div className="py-10 px-8">
       <StepHeader
@@ -58,6 +71,12 @@ export function ActivitiesStep({
           onUpdateAddOnParticipation={onUpdateAddOnParticipation}
           onMarkRecommendationSeen={onMarkRecommendationSeen}
         />
+      )}
+
+      {hasActivityRequirementViolation && (
+        <p className="mt-3 text-xs text-required">
+          * Please select at least one activity to continue with this bundle
+        </p>
       )}
 
       <h2 className="mt-10 text-lg font-medium">Things to do</h2>
@@ -94,7 +113,12 @@ export function ActivitiesStep({
         })}
       </div>
 
-      <StepActions onBack={onBack} onNext={onNext} />
+      <StepActions
+        onBack={onBack}
+        onNext={onNext}
+        nextDisabled={hasActivityRequirementViolation}
+        nextDisabledTooltip="Please select an activity for this bundle"
+      />
     </div>
   );
 }
@@ -203,7 +227,7 @@ function RecommendationCard({
           </span>
         )}
         {recommendation.savings > 0 && (
-          <span className="text-sm text-highlight">
+          <span className="text-sm text-bundle">
             Save {formatCurrency(recommendation.savings)} per person
           </span>
         )}
@@ -218,6 +242,7 @@ function RecommendationCard({
           />
         </div>
       )}
+
     </div>
   );
 }
