@@ -17,7 +17,7 @@ export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
   const total = calculateTotal(trip);
 
   return (
-    <aside className="hidden lg:block w-80 shrink-0">
+    <aside className="hidden lg:block w-80 shrink-0 pt-10">
       <div className="sticky top-8 rounded-xl border border-border bg-white p-6">
         <h3 className="text-sm font-semibold mb-4">Your trip</h3>
 

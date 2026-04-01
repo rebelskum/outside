@@ -76,11 +76,15 @@ export function useTrip() {
   const toggleAddOn = (id: string) =>
     setTrip((prev) => {
       const exists = prev.selectedAddOns.find((a) => a.id === id);
+      const participation =
+        id === "kids-club"
+          ? { type: "partial" as const, adults: 0, kids: prev.travelers.children }
+          : defaultParticipation(prev.travelers);
       return {
         ...prev,
         selectedAddOns: exists
           ? prev.selectedAddOns.filter((a) => a.id !== id)
-          : [...prev.selectedAddOns, { id, participation: defaultParticipation(prev.travelers) }],
+          : [...prev.selectedAddOns, { id, participation }],
       };
     });
 

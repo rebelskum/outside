@@ -1,4 +1,5 @@
-import type { TripState, Participation } from "../../../types/trip";
+import { useState, useRef, useEffect } from "react";
+import type { TripState, Participation, DateRange, TravelerGroup } from "../../../types/trip";
 import { destinations } from "../../../data/mock/destinations";
 import { lodgings } from "../../../data/mock/lodgings";
 import { activities as allActivities } from "../../../data/mock/activities";
@@ -7,10 +8,14 @@ import { recommendations } from "../../../data/mock/recommendations";
 import { calculateTotal, getBundleDiscount } from "../../../domain/services/pricing";
 import { formatCurrency, formatParticipation, getNights, participantCount } from "../../../utils/format";
 import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
+import { DateRangePicker } from "../../../components/shared/DateRangePicker";
+import { GuestPicker } from "../../../components/shared/GuestPicker";
 
 interface ReviewStepProps {
   trip: TripState;
   onBack: () => void;
+  onUpdateDates: (dates: DateRange) => void;
+  onUpdateTravelers: (travelers: TravelerGroup) => void;
   onRemoveActivity: (id: string) => void;
   onUpdateActivityParticipation: (id: string, participation: Participation) => void;
   onRemoveAddOn: (id: string) => void;
@@ -76,16 +81,35 @@ function BundleBadge({ label }: { label: string }) {
 export function ReviewStep({
   trip,
   onBack,
+  onUpdateDates,
+  onUpdateTravelers,
   onRemoveActivity,
   onUpdateActivityParticipation,
   onRemoveAddOn,
   onUpdateAddOnParticipation,
 }: ReviewStepProps) {
+  const [editingStay, setEditingStay] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const staySectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!editingStay) return;
+    const handler = (e: MouseEvent) => {
+      if (staySectionRef.current && !staySectionRef.current.contains(e.target as Node)) {
+        setEditingStay(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [editingStay]);
+
   const destination = destinations.find((d) => d.id === trip.selectedDestinationId);
   const lodging = lodgings.find((l) => l.id === trip.selectedLodgingId);
   const total = calculateTotal(trip);
   const discount = getBundleDiscount(trip);
   const activeBundle = getActiveBundleIds(trip);
+  const nights = getNights(trip.dateRange);
+  const guestCount = trip.travelers.adults + trip.travelers.children;
 
   return (
     <div className="py-10 px-8">
@@ -97,19 +121,36 @@ export function ReviewStep({
       </p>
 
       <div className="mt-8 space-y-6">
-        <section className="rounded-xl border border-border bg-white p-6">
+        <section ref={staySectionRef} className="group rounded-xl border border-border bg-white p-6">
           <h2 className="text-sm font-semibold text-muted uppercase tracking-wide mb-3">Stay</h2>
           <p className="font-medium">{lodging?.name ?? "—"}</p>
           <p className="text-sm text-muted mt-1">
             {destination?.name}, {destination?.region} · {trip.dateRange.start} – {trip.dateRange.end}
           </p>
           <p className="text-sm text-muted">
-            {trip.travelers.adults + trip.travelers.children} guests
+            {guestCount} guest{guestCount !== 1 ? "s" : ""}
           </p>
           {lodging && (
             <p className="text-sm font-medium mt-2">
-              {formatCurrency(lodging.nightlyRate)} × {getNights(trip.dateRange)} night{getNights(trip.dateRange) !== 1 ? "s" : ""}
+              {formatCurrency(lodging.nightlyRate)} × {nights} night{nights !== 1 ? "s" : ""}
             </p>
+          )}
+
+          <div className={`flex items-center gap-1 mt-1.5 transition-opacity ${editingStay ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+            <button
+              onClick={() => setEditingStay(true)}
+              className="flex items-center gap-1 text-[11px] text-muted/60 hover:text-brand transition-colors"
+            >
+              <PencilIcon />
+              <span>Edit</span>
+            </button>
+          </div>
+
+          {editingStay && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              <DateRangePicker dates={trip.dateRange} onChange={onUpdateDates} />
+              <GuestPicker travelers={trip.travelers} onChange={onUpdateTravelers} />
+            </div>
           )}
         </section>
 
@@ -128,17 +169,18 @@ export function ReviewStep({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium">{activity.name}</p>
-                          {isBundled && activeBundle && <BundleBadge label={activeBundle.title} />}
+                          {isBundled && activeBundle && <BundleBadge label="Bundled" />}
                         </div>
                         <p className="text-xs text-muted mt-0.5">{who}</p>
                       </div>
                       <span className="text-sm text-muted mt-0.5">{formatCurrency(activity.price)}/person</span>
                     </div>
-                    <div className="flex items-center gap-1 mt-1.5 h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all overflow-hidden">
+                    <div className={`flex items-center gap-1 mt-1.5 transition-opacity ${editingItemId === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                       <ParticipationPicker
                         participation={item.participation}
                         travelers={trip.travelers}
                         onChange={(p) => onUpdateActivityParticipation(item.id, p)}
+                        onOpenChange={(open) => setEditingItemId(open ? item.id : null)}
                         trigger={({ onClick }) => (
                           <button
                             onClick={onClick}
@@ -185,7 +227,7 @@ export function ReviewStep({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium">{addOn.name}</p>
-                          {isBundled && activeBundle && <BundleBadge label={activeBundle.title} />}
+                          {isBundled && activeBundle && <BundleBadge label="Bundled" />}
                         </div>
                         <p className="text-xs text-muted mt-0.5">{who}</p>
                       </div>
@@ -197,11 +239,13 @@ export function ReviewStep({
                           : "Included"}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 mt-1.5 h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all overflow-hidden">
+                    <div className={`flex items-center gap-1 mt-1.5 transition-opacity ${editingItemId === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                       <ParticipationPicker
                         participation={item.participation}
                         travelers={trip.travelers}
                         onChange={(p) => onUpdateAddOnParticipation(item.id, p)}
+                        onOpenChange={(open) => setEditingItemId(open ? item.id : null)}
+                        kidsOnly={item.id === "kids-club"}
                         trigger={({ onClick }) => (
                           <button
                             onClick={onClick}

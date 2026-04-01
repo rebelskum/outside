@@ -83,6 +83,8 @@ export function TripBuilderPage() {
           <ReviewStep
             trip={trip}
             onBack={prevStep}
+            onUpdateDates={setDates}
+            onUpdateTravelers={setTravelers}
             onRemoveActivity={toggleActivity}
             onUpdateActivityParticipation={updateActivityParticipation}
             onRemoveAddOn={toggleAddOn}

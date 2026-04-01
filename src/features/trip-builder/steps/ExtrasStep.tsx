@@ -22,7 +22,10 @@ export function ExtrasStep({
   onNext,
 }: ExtrasStepProps) {
   const destinationId = trip.selectedDestinationId!;
-  const globalAddOns = addOns.filter((a) => a.destinationId === null);
+  const hasKids = trip.travelers.children > 0;
+  const globalAddOns = addOns.filter(
+    (a) => a.destinationId === null && (a.id !== "kids-club" || hasKids)
+  );
   const diningAddOns = addOns.filter(
     (a) => a.destinationId === destinationId && a.category === "Dining"
   );
@@ -79,6 +82,7 @@ export function ExtrasStep({
                     participation={selectedItem.participation}
                     travelers={trip.travelers}
                     onChange={(p) => onUpdateAddOnParticipation(addon.id, p)}
+                    kidsOnly={addon.id === "kids-club"}
                   />
                 </div>
               )}
