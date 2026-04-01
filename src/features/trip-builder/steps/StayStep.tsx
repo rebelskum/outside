@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { TravelerGroup, DateRange } from "../../../types/trip";
 import { destinations } from "../../../data/mock/destinations";
 import { lodgings } from "../../../data/mock/lodgings";
+import { OptimizedImage, preloadImages } from "../../../components/shared/OptimizedImage";
 import { StayMap } from "../../../components/trip/StayMap";
 import { DateRangePicker } from "../../../components/shared/DateRangePicker";
 import { GuestPicker } from "../../../components/shared/GuestPicker";
@@ -30,6 +31,10 @@ export function StayStep({
   const destination = destinations.find((d) => d.id === destinationId);
   const available = lodgings.filter((l) => l.destinationId === destinationId);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    preloadImages(available.map((l) => l.image));
+  }, [destinationId]);
 
   function handleSelect(lodgingId: string) {
     onSelectLodging(lodgingId);
@@ -75,9 +80,11 @@ export function StayStep({
             }`}
           >
             <div className="flex gap-5">
-              <div className="h-20 w-28 shrink-0 rounded-lg bg-gray-100 flex items-center justify-center text-muted text-xs">
-                photo
-              </div>
+              <OptimizedImage
+                src={lodge.image}
+                alt={lodge.name}
+                className="h-20 w-28 shrink-0 rounded-lg"
+              />
               <div>
                 <p className="font-medium">{lodge.name}</p>
                 <p className="text-sm text-muted mt-1">{lodge.shortDescription}</p>

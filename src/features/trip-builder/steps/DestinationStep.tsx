@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Vibe } from "../../../types/trip";
 import { destinations } from "../../../data/mock/destinations";
+import { OptimizedImage, preloadImages } from "../../../components/shared/OptimizedImage";
 
 const VIBES: { id: Vibe; label: string; emoji: string }[] = [
   { id: "mountains", label: "Mountains", emoji: "🏔" },
@@ -17,6 +18,10 @@ export function DestinationStep({ onSelect, needsConfirmation }: DestinationStep
   const [query, setQuery] = useState("");
   const [selectedVibe, setSelectedVibe] = useState<Vibe | null>(null);
   const [pendingDestinationId, setPendingDestinationId] = useState<string | null>(null);
+
+  useEffect(() => {
+    preloadImages(destinations.map((d) => d.image));
+  }, []);
 
   const searchResults = query.length >= 2
     ? destinations.filter((d) =>
@@ -118,9 +123,11 @@ export function DestinationStep({ onSelect, needsConfirmation }: DestinationStep
                     className="w-full rounded-xl border border-border bg-white p-5 text-left hover:border-brand/30 hover:shadow-sm transition-all"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="h-14 w-14 shrink-0 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-muted">
-                        {dest.heroLabel}
-                      </div>
+                      <OptimizedImage
+                        src={dest.image}
+                        alt={dest.name}
+                        className="h-14 w-14 shrink-0 rounded-lg"
+                      />
                       <div>
                         <p className="font-medium">{dest.name}</p>
                         <p className="text-sm text-muted mt-0.5">{dest.region} · {dest.shortDescription}</p>

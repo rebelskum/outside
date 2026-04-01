@@ -11,7 +11,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 240,
     maxGuests: 4,
     amenities: ["Fireplace", "Mountain views", "Full kitchen", "Deck"],
-    image: "/images/lodgings/pc-cabin.jpg",
+    image: "https://images.unsplash.com/photo-1520984032042-162d526883e0?w=800&q=80",
     mapPosition: { x: 35, y: 30 },
   },
   {
@@ -23,7 +23,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 320,
     maxGuests: 2,
     amenities: ["Ski-in/ski-out", "Hot tub", "Modern design", "Bar"],
-    image: "/images/lodgings/pc-suite.jpg",
+    image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&q=80",
     mapPosition: { x: 60, y: 55 },
   },
   {
@@ -35,7 +35,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 380,
     maxGuests: 6,
     amenities: ["Game room", "Heated garage", "Two fireplaces", "Sauna"],
-    image: "/images/lodgings/pc-chalet.jpg",
+    image: "https://images.unsplash.com/photo-1542718610-a1d656d1884c?w=800&q=80",
     mapPosition: { x: 72, y: 28 },
   },
 
@@ -49,7 +49,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 280,
     maxGuests: 4,
     amenities: ["Breakfast included", "Lounge", "Mountain views", "Fireplace"],
-    image: "/images/lodgings/as-lodge.jpg",
+    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80",
     mapPosition: { x: 30, y: 40 },
   },
   {
@@ -61,7 +61,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 260,
     maxGuests: 2,
     amenities: ["Walkable", "Espresso machine", "Rooftop access", "Modern"],
-    image: "/images/lodgings/as-loft.jpg",
+    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
     mapPosition: { x: 65, y: 60 },
   },
   {
@@ -73,7 +73,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 420,
     maxGuests: 6,
     amenities: ["Kids room", "Full kitchen", "Hot tub", "Ski storage"],
-    image: "/images/lodgings/as-retreat.jpg",
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
     mapPosition: { x: 75, y: 25 },
   },
 
@@ -87,7 +87,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 300,
     maxGuests: 4,
     amenities: ["Private dock", "Lake views", "Fire pit", "Kayaks"],
-    image: "/images/lodgings/lt-lakefront.jpg",
+    image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=80",
     mapPosition: { x: 50, y: 35 },
   },
   {
@@ -99,7 +99,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 220,
     maxGuests: 2,
     amenities: ["Reading nook", "Wood stove", "Hiking trails", "Quiet"],
-    image: "/images/lodgings/lt-cottage.jpg",
+    image: "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=80",
     mapPosition: { x: 28, y: 60 },
   },
   {
@@ -111,7 +111,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 450,
     maxGuests: 8,
     amenities: ["Game room", "Chef kitchen", "Hot tub", "Lake access"],
-    image: "/images/lodgings/lt-house.jpg",
+    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80",
     mapPosition: { x: 70, y: 50 },
   },
 
@@ -125,7 +125,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 195,
     maxGuests: 4,
     amenities: ["Outdoor shower", "Fire pit", "Stargazing deck", "Kitchen"],
-    image: "/images/lodgings/jt-adobe.jpg",
+    image: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800&q=80",
     mapPosition: { x: 40, y: 35 },
   },
   {
@@ -137,7 +137,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 150,
     maxGuests: 2,
     amenities: ["AC", "Mini kitchen", "Record player", "Hammock"],
-    image: "/images/lodgings/jt-airstream.jpg",
+    image: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&q=80",
     mapPosition: { x: 65, y: 55 },
   },
   {
@@ -149,7 +149,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 340,
     maxGuests: 6,
     amenities: ["Pool", "Hot tub", "BBQ", "Desert garden"],
-    image: "/images/lodgings/jt-hacienda.jpg",
+    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80",
     mapPosition: { x: 30, y: 65 },
   },
 
@@ -163,7 +163,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 175,
     maxGuests: 4,
     amenities: ["Patio", "Mountain views", "Grill", "Garage"],
-    image: "/images/lodgings/sg-casita.jpg",
+    image: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=800&q=80",
     mapPosition: { x: 35, y: 30 },
   },
   {
@@ -175,7 +175,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 140,
     maxGuests: 2,
     amenities: ["Modern design", "Espresso machine", "Balcony", "Quiet"],
-    image: "/images/lodgings/sg-studio.jpg",
+    image: "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800&q=80",
     mapPosition: { x: 62, y: 58 },
   },
   {
@@ -187,7 +187,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 380,
     maxGuests: 8,
     amenities: ["Pool", "Game room", "Trail access", "Chef kitchen"],
-    image: "/images/lodgings/sg-villa.jpg",
+    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80",
     mapPosition: { x: 72, y: 40 },
   },
 
@@ -201,7 +201,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 285,
     maxGuests: 4,
     amenities: ["Bay views", "Period details", "Full kitchen", "Garden"],
-    image: "/images/lodgings/sf-victorian.jpg",
+    image: "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=800&q=80",
     mapPosition: { x: 38, y: 32 },
   },
   {
@@ -213,7 +213,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 230,
     maxGuests: 2,
     amenities: ["Walkable", "Rooftop access", "Espresso machine", "Modern"],
-    image: "/images/lodgings/sf-loft.jpg",
+    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
     mapPosition: { x: 60, y: 55 },
   },
   {
@@ -225,7 +225,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 360,
     maxGuests: 6,
     amenities: ["Beach access", "Fire pit", "Surfboard storage", "Deck"],
-    image: "/images/lodgings/sf-beach-house.jpg",
+    image: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800&q=80",
     mapPosition: { x: 25, y: 62 },
   },
 
@@ -239,7 +239,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 210,
     maxGuests: 2,
     amenities: ["Ocean views", "Breakfast included", "Garden", "Fireplace"],
-    image: "/images/lodgings/mc-inn.jpg",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
     mapPosition: { x: 30, y: 38 },
   },
   {
@@ -251,7 +251,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 245,
     maxGuests: 4,
     amenities: ["Hot tub", "Wood stove", "Hiking trails", "Privacy"],
-    image: "/images/lodgings/mc-cottage.jpg",
+    image: "https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800&q=80",
     mapPosition: { x: 68, y: 28 },
   },
   {
@@ -263,7 +263,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 395,
     maxGuests: 6,
     amenities: ["Chef kitchen", "Meadow", "Fire pit", "Ocean views"],
-    image: "/images/lodgings/mc-farmhouse.jpg",
+    image: "https://images.unsplash.com/photo-1505843513577-22bb7d21e455?w=800&q=80",
     mapPosition: { x: 50, y: 60 },
   },
 
@@ -277,7 +277,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 225,
     maxGuests: 4,
     amenities: ["Private pool", "Mountain views", "Patio", "Record player"],
-    image: "/images/lodgings/ps-bungalow.jpg",
+    image: "https://images.unsplash.com/photo-1540518614846-7eded433c457?w=800&q=80",
     mapPosition: { x: 42, y: 35 },
   },
   {
@@ -289,7 +289,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 165,
     maxGuests: 2,
     amenities: ["Courtyard", "Outdoor shower", "Hammock", "AC"],
-    image: "/images/lodgings/ps-casita.jpg",
+    image: "https://images.unsplash.com/photo-1577495508326-19a1b3cf65b7?w=800&q=80",
     mapPosition: { x: 65, y: 58 },
   },
   {
@@ -301,7 +301,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 420,
     maxGuests: 8,
     amenities: ["Infinity pool", "Chef kitchen", "Fire pit", "Putting green"],
-    image: "/images/lodgings/ps-estate.jpg",
+    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
     mapPosition: { x: 30, y: 65 },
   },
 
@@ -315,7 +315,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 275,
     maxGuests: 4,
     amenities: ["Water views", "Kayak", "Deck", "Full kitchen"],
-    image: "/images/lodgings/se-houseboat.jpg",
+    image: "https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?w=800&q=80",
     mapPosition: { x: 45, y: 32 },
   },
   {
@@ -327,7 +327,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 185,
     maxGuests: 2,
     amenities: ["Walkable", "Espresso machine", "Record player", "Modern"],
-    image: "/images/lodgings/se-studio.jpg",
+    image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
     mapPosition: { x: 62, y: 55 },
   },
   {
@@ -339,7 +339,7 @@ export const lodgings: Lodging[] = [
     nightlyRate: 310,
     maxGuests: 6,
     amenities: ["Forest setting", "Fire pit", "Hot tub", "Ferry access"],
-    image: "/images/lodgings/se-cabin.jpg",
+    image: "https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?w=800&q=80",
     mapPosition: { x: 25, y: 45 },
   },
 ];
