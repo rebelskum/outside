@@ -79,7 +79,16 @@ export function TripBuilderPage() {
           />
         );
       case "review":
-        return <ReviewStep trip={trip} onBack={prevStep} />;
+        return (
+          <ReviewStep
+            trip={trip}
+            onBack={prevStep}
+            onRemoveActivity={toggleActivity}
+            onUpdateActivityParticipation={updateActivityParticipation}
+            onRemoveAddOn={toggleAddOn}
+            onUpdateAddOnParticipation={updateAddOnParticipation}
+          />
+        );
       default:
         return null;
     }

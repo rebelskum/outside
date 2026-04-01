@@ -196,7 +196,7 @@ function RecommendationCard({
         )}
         {recommendation.savings > 0 && (
           <span className="text-sm text-emerald-600">
-            Save {formatCurrency(recommendation.savings)}
+            Save {formatCurrency(recommendation.savings)} per person
           </span>
         )}
       </div>

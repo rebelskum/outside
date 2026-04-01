@@ -5,12 +5,14 @@ interface ParticipationPickerProps {
   participation: Participation;
   travelers: TravelerGroup;
   onChange: (participation: Participation) => void;
+  trigger?: (props: { label: string; onClick: (e: React.MouseEvent) => void }) => React.ReactNode;
 }
 
 export function ParticipationPicker({
   participation,
   travelers,
   onChange,
+  trigger,
 }: ParticipationPickerProps) {
   const [open, setOpen] = useState(false);
   const isCustom = participation.type === "partial";
@@ -24,17 +26,23 @@ export function ParticipationPicker({
         .join(", ")
     : "Everyone";
 
+  const handleToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpen(!open);
+  };
+
   return (
     <div className="relative">
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpen(!open);
-        }}
-        className="text-xs text-muted hover:text-brand transition-colors"
-      >
-        Who's going? <span className="font-medium text-brand">{label}</span>
-      </button>
+      {trigger ? (
+        trigger({ label, onClick: handleToggle })
+      ) : (
+        <button
+          onClick={handleToggle}
+          className="text-xs text-muted hover:text-brand transition-colors"
+        >
+          Who's going? <span className="font-medium text-brand">{label}</span>
+        </button>
+      )}
 
       {open && (
         <div
