@@ -26,17 +26,30 @@ function defaultParticipation(travelers: TravelerGroup): Participation {
   return { type: "everyone", adults: travelers.adults, kids: travelers.children };
 }
 
+function toggleItem(
+  items: SelectedItem[],
+  id: string,
+  makeParticipation: () => Participation,
+): SelectedItem[] {
+  return items.some((a) => a.id === id)
+    ? items.filter((a) => a.id !== id)
+    : [...items, { id, participation: makeParticipation() }];
+}
+
+function updateItemParticipation(
+  items: SelectedItem[],
+  id: string,
+  participation: Participation,
+): SelectedItem[] {
+  return items.map((a) => (a.id === id ? { ...a, participation } : a));
+}
+
 export function useTrip() {
   const [trip, setTrip] = useState<TripState>(loadState);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(trip));
   }, [trip]);
-
-  const hasDownstreamSelections = (state: TripState) =>
-    state.selectedLodgingId !== null ||
-    state.selectedActivities.length > 0 ||
-    state.selectedAddOns.length > 0;
 
   const setDestination = (id: string) =>
     setTrip((prev) => {
@@ -56,7 +69,9 @@ export function useTrip() {
   const needsDestinationChangeConfirmation = (newId: string) =>
     trip.selectedDestinationId !== null &&
     trip.selectedDestinationId !== newId &&
-    hasDownstreamSelections(trip);
+    (trip.selectedLodgingId !== null ||
+      trip.selectedActivities.length > 0 ||
+      trip.selectedAddOns.length > 0);
 
   const setLodging = (id: string) =>
     setTrip((prev) => ({ ...prev, selectedLodgingId: id }));
@@ -68,79 +83,52 @@ export function useTrip() {
     setTrip((prev) => ({ ...prev, dateRange }));
 
   const toggleActivity = (id: string) =>
-    setTrip((prev) => {
-      const exists = prev.selectedActivities.find((a) => a.id === id);
-      return {
-        ...prev,
-        selectedActivities: exists
-          ? prev.selectedActivities.filter((a) => a.id !== id)
-          : [...prev.selectedActivities, { id, participation: defaultParticipation(prev.travelers) }],
-      };
-    });
+    setTrip((prev) => ({
+      ...prev,
+      selectedActivities: toggleItem(
+        prev.selectedActivities, id, () => defaultParticipation(prev.travelers),
+      ),
+    }));
 
   const updateActivityParticipation = (id: string, participation: Participation) =>
     setTrip((prev) => ({
       ...prev,
-      selectedActivities: prev.selectedActivities.map((a) =>
-        a.id === id ? { ...a, participation } : a
-      ),
+      selectedActivities: updateItemParticipation(prev.selectedActivities, id, participation),
     }));
 
   const toggleAddOn = (id: string) =>
-    setTrip((prev) => {
-      const exists = prev.selectedAddOns.find((a) => a.id === id);
-      const participation =
+    setTrip((prev) => ({
+      ...prev,
+      selectedAddOns: toggleItem(prev.selectedAddOns, id, () =>
         id === "kids-club"
           ? { type: "partial" as const, adults: 0, kids: prev.travelers.children }
-          : defaultParticipation(prev.travelers);
-      return {
-        ...prev,
-        selectedAddOns: exists
-          ? prev.selectedAddOns.filter((a) => a.id !== id)
-          : [...prev.selectedAddOns, { id, participation }],
-      };
-    });
+          : defaultParticipation(prev.travelers),
+      ),
+    }));
 
   const updateAddOnParticipation = (id: string, participation: Participation) =>
     setTrip((prev) => ({
       ...prev,
-      selectedAddOns: prev.selectedAddOns.map((a) =>
-        a.id === id ? { ...a, participation } : a
-      ),
+      selectedAddOns: updateItemParticipation(prev.selectedAddOns, id, participation),
     }));
-
-  const selectedActivityIds = trip.selectedActivities.map((a) => a.id);
-  const selectedAddOnIds = trip.selectedAddOns.map((a) => a.id);
-
-  const findActivity = (id: string): SelectedItem | undefined =>
-    trip.selectedActivities.find((a) => a.id === id);
-
-  const findAddOn = (id: string): SelectedItem | undefined =>
-    trip.selectedAddOns.find((a) => a.id === id);
 
   const goToStep = (step: StepId) =>
     setTrip((prev) => ({ ...prev, currentStep: step }));
 
   const nextStep = () =>
     setTrip((prev) => {
-      const currentIndex = STEP_ORDER.indexOf(prev.currentStep);
-      const next = STEP_ORDER[currentIndex + 1];
+      const next = STEP_ORDER[STEP_ORDER.indexOf(prev.currentStep) + 1];
       return next ? { ...prev, currentStep: next } : prev;
     });
 
   const prevStep = () =>
     setTrip((prev) => {
-      const currentIndex = STEP_ORDER.indexOf(prev.currentStep);
-      const previous = STEP_ORDER[currentIndex - 1];
+      const previous = STEP_ORDER[STEP_ORDER.indexOf(prev.currentStep) - 1];
       return previous ? { ...prev, currentStep: previous } : prev;
     });
 
   return {
     trip,
-    selectedActivityIds,
-    selectedAddOnIds,
-    findActivity,
-    findAddOn,
     setDestination,
     needsDestinationChangeConfirmation,
     setLodging,

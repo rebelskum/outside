@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import type { TravelerGroup, DateRange } from "../../../types/trip";
-import { destinations } from "../../../data/mock/destinations";
-import { lodgings } from "../../../data/mock/lodgings";
+import { getDestination, getLodgingsForDestination } from "../../../data/selectors";
 import { OptimizedImage, preloadImages } from "../../../components/shared/OptimizedImage";
 import { StayMap } from "../../../components/trip/StayMap";
 import { DateRangePicker } from "../../../components/shared/DateRangePicker";
 import { GuestPicker } from "../../../components/shared/GuestPicker";
+import { StepHeader } from "../../../components/shared/StepHeader";
+import { StepActions } from "../../../components/shared/StepActions";
 
 interface StayStepProps {
   destinationId: string;
@@ -28,8 +29,8 @@ export function StayStep({
   onBack,
   onNext,
 }: StayStepProps) {
-  const destination = destinations.find((d) => d.id === destinationId);
-  const available = lodgings.filter((l) => l.destinationId === destinationId);
+  const destination = getDestination(destinationId);
+  const available = getLodgingsForDestination(destinationId);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,12 +44,10 @@ export function StayStep({
 
   return (
     <div className="py-10 px-8">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        {destination?.name}, {destination?.region}
-      </h1>
-      <p className="mt-1 text-muted">
-        A curated stay selection for your weekend trip
-      </p>
+      <StepHeader
+        title={`${destination?.name}, ${destination?.region}`}
+        subtitle="A curated stay selection for your weekend trip"
+      />
 
       <div className="mt-4 flex gap-3">
         <DateRangePicker dates={dates} onChange={onUpdateDates} />
@@ -99,20 +98,7 @@ export function StayStep({
         ))}
       </div>
 
-      <div className="mt-10 flex justify-between">
-        <button
-          onClick={onBack}
-          className="text-sm text-muted hover:text-brand transition-colors"
-        >
-          ← Back
-        </button>
-        <button
-          onClick={onNext}
-          className="rounded-lg bg-accent text-brand px-6 py-2.5 text-sm font-medium hover:bg-brand hover:text-white transition-colors"
-        >
-          Continue
-        </button>
-      </div>
+      <StepActions onBack={onBack} onNext={onNext} />
     </div>
   );
 }

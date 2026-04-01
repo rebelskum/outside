@@ -19,16 +19,12 @@ export function pluralize(count: number, singular: string, plural?: string): str
 }
 
 export function formatParticipation(p: Participation, travelers: TravelerGroup): string {
-  if (p.type === "everyone") {
-    const parts: string[] = [];
-    if (travelers.adults > 0) parts.push(pluralize(travelers.adults, "adult"));
-    if (travelers.children > 0) parts.push(pluralize(travelers.children, "kid"));
-    return parts.join(", ");
-  }
-  const parts: string[] = [];
-  if (p.adults > 0) parts.push(pluralize(p.adults, "adult"));
-  if (p.kids > 0) parts.push(pluralize(p.kids, "kid"));
-  return parts.join(", ");
+  const adults = p.type === "everyone" ? travelers.adults : p.adults;
+  const kids = p.type === "everyone" ? travelers.children : p.kids;
+  return [
+    adults > 0 && pluralize(adults, "adult"),
+    kids > 0 && pluralize(kids, "kid"),
+  ].filter(Boolean).join(", ");
 }
 
 export function participantCount(p: Participation, travelers: TravelerGroup): number {

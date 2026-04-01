@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import type { DateRange } from "../../types/trip";
+import { useClickOutside } from "../../hooks/useClickOutside";
 
 const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -56,14 +57,7 @@ export function DateRangePicker({ dates, onChange }: DateRangePickerProps) {
     setEnd(parseStored(dates.end));
   }, [dates.start, dates.end]);
 
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  useClickOutside(ref, open, () => setOpen(false));
 
   function handleDayClick(day: Date) {
     if (!start || end) {

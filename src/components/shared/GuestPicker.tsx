@@ -1,5 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import type { TravelerGroup } from "../../types/trip";
+import { useClickOutside } from "../../hooks/useClickOutside";
+import { Stepper } from "./Stepper";
 
 interface GuestPickerProps {
   travelers: TravelerGroup;
@@ -10,15 +12,7 @@ export function GuestPicker({ travelers, onChange }: GuestPickerProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    if (open) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open]);
+  useClickOutside(ref, open, () => setOpen(false));
 
   const total = travelers.adults + travelers.children;
   const label =
@@ -41,53 +35,18 @@ export function GuestPicker({ travelers, onChange }: GuestPickerProps) {
       {open && (
         <div className="absolute left-0 top-full mt-2 z-20 w-56 rounded-xl border border-border bg-white p-4 shadow-lg">
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted">Adults</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    onChange({ ...travelers, adults: Math.max(1, travelers.adults - 1) })
-                  }
-                  disabled={travelers.adults <= 1}
-                  className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors disabled:opacity-30 disabled:hover:border-border"
-                >
-                  −
-                </button>
-                <span className="w-4 text-center text-sm font-medium">{travelers.adults}</span>
-                <button
-                  onClick={() =>
-                    onChange({ ...travelers, adults: travelers.adults + 1 })
-                  }
-                  className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted">Kids</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    onChange({ ...travelers, children: Math.max(0, travelers.children - 1) })
-                  }
-                  disabled={travelers.children <= 0}
-                  className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors disabled:opacity-30 disabled:hover:border-border"
-                >
-                  −
-                </button>
-                <span className="w-4 text-center text-sm font-medium">{travelers.children}</span>
-                <button
-                  onClick={() =>
-                    onChange({ ...travelers, children: travelers.children + 1 })
-                  }
-                  className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors"
-                >
-                  +
-                </button>
-              </div>
-            </div>
+            <Stepper
+              label="Adults"
+              value={travelers.adults}
+              onChange={(v) => onChange({ ...travelers, adults: v })}
+              min={1}
+            />
+            <Stepper
+              label="Kids"
+              value={travelers.children}
+              onChange={(v) => onChange({ ...travelers, children: v })}
+              min={0}
+            />
           </div>
 
           <button

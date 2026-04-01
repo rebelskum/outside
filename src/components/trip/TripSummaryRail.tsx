@@ -1,8 +1,5 @@
 import type { TripState } from "../../types/trip";
-import { destinations } from "../../data/mock/destinations";
-import { lodgings } from "../../data/mock/lodgings";
-import { activities } from "../../data/mock/activities";
-import { addOns } from "../../data/mock/addons";
+import { getDestination, getLodging, getActivity, getAddOn } from "../../data/selectors";
 import { calculateTotal } from "../../domain/services/pricing";
 import { formatCurrency, formatParticipation } from "../../utils/format";
 
@@ -12,8 +9,8 @@ interface TripSummaryRailProps {
 }
 
 export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
-  const destination = destinations.find((d) => d.id === trip.selectedDestinationId);
-  const lodging = lodgings.find((l) => l.id === trip.selectedLodgingId);
+  const destination = trip.selectedDestinationId ? getDestination(trip.selectedDestinationId) : undefined;
+  const lodging = trip.selectedLodgingId ? getLodging(trip.selectedLodgingId) : undefined;
   const total = calculateTotal(trip);
 
   return (
@@ -36,7 +33,7 @@ export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
             {trip.selectedActivities.length > 0 ? (
               <ul className="space-y-1 mt-1">
                 {trip.selectedActivities.map((item) => {
-                  const activity = activities.find((a) => a.id === item.id);
+                  const activity = getActivity(item.id);
                   if (!activity) return null;
                   const who = formatParticipation(item.participation, trip.travelers);
                   return (
@@ -57,7 +54,7 @@ export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
             {trip.selectedAddOns.length > 0 ? (
               <ul className="space-y-1 mt-1">
                 {trip.selectedAddOns.map((item) => {
-                  const addOn = addOns.find((a) => a.id === item.id);
+                  const addOn = getAddOn(item.id);
                   if (!addOn) return null;
                   const who = formatParticipation(item.participation, trip.travelers);
                   return (

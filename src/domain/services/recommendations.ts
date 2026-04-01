@@ -1,20 +1,21 @@
 import type { TripState, Recommendation } from "../../types/trip";
 import { recommendations } from "../../data/mock/recommendations";
-import { activities } from "../../data/mock/activities";
-import { destinations } from "../../data/mock/destinations";
-
-const SKI_RECOMMENDATION_IDS = new Set(["ski-bundle", "gear-and-guide"]);
+import { getActivity, getDestination } from "../../data/selectors";
+import { isRecommendationAllowed } from "./bundles";
 
 export function getRecommendations(trip: TripState): Recommendation[] {
-  const vibe = destinations.find((d) => d.id === trip.selectedDestinationId)?.vibe;
-  const selectedActivityIds = trip.selectedActivities.map((a) => a.id);
+  const vibe = trip.selectedDestinationId
+    ? getDestination(trip.selectedDestinationId)?.vibe
+    : undefined;
   const selectedAddOnIds = trip.selectedAddOns.map((a) => a.id);
 
   return recommendations.filter((rec) => {
-    if (vibe !== "mountains" && SKI_RECOMMENDATION_IDS.has(rec.id)) return false;
+    if (!isRecommendationAllowed(rec, vibe)) return false;
     switch (rec.trigger.type) {
       case "activity_selected": {
-        const selected = activities.filter((a) => selectedActivityIds.includes(a.id));
+        const selected = trip.selectedActivities
+          .map((a) => getActivity(a.id))
+          .filter((a) => a !== undefined);
         return selected.some((a) => a.tags.includes(rec.trigger.value ?? ""));
       }
       case "has_children":

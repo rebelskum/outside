@@ -1,14 +1,15 @@
 import type { TripState, Recommendation, Participation } from "../../../types/trip";
-import { destinations } from "../../../data/mock/destinations";
-import { activities } from "../../../data/mock/activities";
 import { getRecommendations } from "../../../domain/services/recommendations";
+import { getRelevantActivityIds } from "../../../domain/services/bundles";
+import { getDestination, getActivitiesForDestination } from "../../../data/selectors";
 import { formatCurrency } from "../../../utils/format";
 import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
+import { SelectableCard } from "../../../components/shared/SelectableCard";
+import { StepHeader } from "../../../components/shared/StepHeader";
+import { StepActions } from "../../../components/shared/StepActions";
 
 interface ActivitiesStepProps {
   trip: TripState;
-  selectedActivityIds: string[];
-  selectedAddOnIds: string[];
   onToggleActivity: (activityId: string) => void;
   onUpdateActivityParticipation: (id: string, participation: Participation) => void;
   onToggleAddOn: (addOnId: string) => void;
@@ -19,8 +20,6 @@ interface ActivitiesStepProps {
 
 export function ActivitiesStep({
   trip,
-  selectedActivityIds,
-  selectedAddOnIds,
   onToggleActivity,
   onUpdateActivityParticipation,
   onToggleAddOn,
@@ -29,20 +28,20 @@ export function ActivitiesStep({
   onNext,
 }: ActivitiesStepProps) {
   const destinationId = trip.selectedDestinationId!;
-  const destination = destinations.find((d) => d.id === destinationId);
-  const available = activities.filter((a) => a.destinationId === destinationId);
+  const selectedActivityIds = trip.selectedActivities.map((a) => a.id);
+  const selectedAddOnIds = trip.selectedAddOns.map((a) => a.id);
+  const destination = getDestination(destinationId);
+  const available = getActivitiesForDestination(destinationId);
 
   const recs = getRecommendations(trip);
   const recommendation = recs.length > 0 ? recs[0] : null;
 
   return (
     <div className="py-10 px-8">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Your stay in {destination?.name}, {destination?.region}
-      </h1>
-      <p className="mt-1 text-muted">
-        Now add a few things to do nearby
-      </p>
+      <StepHeader
+        title={`Your stay in ${destination?.name}, ${destination?.region}`}
+        subtitle="Now add a few things to do nearby"
+      />
 
       {recommendation && (
         <RecommendationCard
@@ -65,60 +64,34 @@ export function ActivitiesStep({
           const selected = selectedActivityIds.includes(activity.id);
           const selectedItem = trip.selectedActivities.find((a) => a.id === activity.id);
           return (
-            <div
+            <SelectableCard
               key={activity.id}
-              className={`rounded-xl border p-5 transition-all ${
-                selected
-                  ? "border-brand bg-brand/[0.03]"
-                  : "border-border bg-white hover:border-brand/30 hover:shadow-sm"
-              }`}
+              selected={selected}
+              onToggle={() => onToggleActivity(activity.id)}
+              trailing={
+                <span className={`text-sm ${selected ? "text-brand" : "text-muted"}`}>
+                  {selected ? "✓ Added" : "+ Add"}
+                </span>
+              }
+              expanded={selected && selectedItem ? (
+                <ParticipationPicker
+                  participation={selectedItem.participation}
+                  travelers={trip.travelers}
+                  onChange={(p) => onUpdateActivityParticipation(activity.id, p)}
+                />
+              ) : undefined}
             >
-              <button
-                onClick={() => onToggleActivity(activity.id)}
-                className="w-full text-left"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{activity.name}</p>
-                    <p className="text-sm text-muted mt-1">{activity.shortDescription}</p>
-                    <p className="text-xs text-muted mt-1">
-                      {activity.duration} · ${activity.price}/person
-                    </p>
-                  </div>
-                  <span className={`text-sm ${selected ? "text-brand" : "text-muted"}`}>
-                    {selected ? "✓ Added" : "+ Add"}
-                  </span>
-                </div>
-              </button>
-
-              {selected && selectedItem && (
-                <div className="mt-3 pt-3 border-t border-border/50">
-                  <ParticipationPicker
-                    participation={selectedItem.participation}
-                    travelers={trip.travelers}
-                    onChange={(p) => onUpdateActivityParticipation(activity.id, p)}
-                  />
-                </div>
-              )}
-            </div>
+              <p className="font-medium">{activity.name}</p>
+              <p className="text-sm text-muted mt-1">{activity.shortDescription}</p>
+              <p className="text-xs text-muted mt-1">
+                {activity.duration} · ${activity.price}/person
+              </p>
+            </SelectableCard>
           );
         })}
       </div>
 
-      <div className="mt-10 flex justify-between">
-        <button
-          onClick={onBack}
-          className="text-sm text-muted hover:text-brand transition-colors"
-        >
-          ← Back
-        </button>
-        <button
-          onClick={onNext}
-          className="rounded-lg bg-accent text-brand px-6 py-2.5 text-sm font-medium hover:bg-brand hover:text-white transition-colors"
-        >
-          Continue
-        </button>
-      </div>
+      <StepActions onBack={onBack} onNext={onNext} />
     </div>
   );
 }
@@ -144,10 +117,7 @@ function RecommendationCard({
   onToggleAddOn: (id: string) => void;
   onUpdateAddOnParticipation: (id: string, participation: Participation) => void;
 }) {
-  const relevantActivityIds = recommendation.activityIds.filter((id) => {
-    const activity = activities.find((a) => a.id === id);
-    return activity?.destinationId === destinationId;
-  });
+  const relevantActivityIds = getRelevantActivityIds(recommendation, destinationId);
 
   const allAlreadyAdded =
     relevantActivityIds.every((id) => selectedActivityIds.includes(id)) &&

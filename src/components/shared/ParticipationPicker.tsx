@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Participation, TravelerGroup } from "../../types/trip";
+import { Stepper } from "./Stepper";
 
 interface ParticipationPickerProps {
   participation: Participation;
@@ -62,28 +63,13 @@ export function ParticipationPicker({
         >
           {kidsOnly ? (
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted">Kids</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() =>
-                      onChange({ ...participation, adults: 0, kids: Math.max(1, participation.kids - 1) })
-                    }
-                    className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors"
-                  >
-                    −
-                  </button>
-                  <span className="w-4 text-center text-sm font-medium">{participation.kids}</span>
-                  <button
-                    onClick={() =>
-                      onChange({ ...participation, adults: 0, kids: Math.min(travelers.children, participation.kids + 1) })
-                    }
-                    className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
+              <Stepper
+                label="Kids"
+                value={participation.kids}
+                onChange={(v) => onChange({ ...participation, adults: 0, kids: v })}
+                min={1}
+                max={travelers.children}
+              />
               <button
                 onClick={() => setOpen(false)}
                 className="mt-1 w-full rounded-lg bg-accent text-brand py-1.5 text-xs font-medium hover:bg-brand hover:text-white transition-colors"
@@ -125,51 +111,18 @@ export function ParticipationPicker({
 
               {isCustom && (
                 <div className="mt-3 space-y-2 border-t border-border pt-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted">Adults</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() =>
-                          onChange({ ...participation, adults: Math.max(0, participation.adults - 1) })
-                        }
-                        className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors"
-                      >
-                        −
-                      </button>
-                      <span className="w-4 text-center text-sm font-medium">{participation.adults}</span>
-                      <button
-                        onClick={() =>
-                          onChange({ ...participation, adults: participation.adults + 1 })
-                        }
-                        className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted">Kids</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() =>
-                          onChange({ ...participation, kids: Math.max(0, participation.kids - 1) })
-                        }
-                        className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors"
-                      >
-                        −
-                      </button>
-                      <span className="w-4 text-center text-sm font-medium">{participation.kids}</span>
-                      <button
-                        onClick={() =>
-                          onChange({ ...participation, kids: participation.kids + 1 })
-                        }
-                        className="h-7 w-7 rounded-full border border-border text-sm hover:border-brand/30 transition-colors"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
+                  <Stepper
+                    label="Adults"
+                    value={participation.adults}
+                    onChange={(v) => onChange({ ...participation, adults: v })}
+                    min={0}
+                  />
+                  <Stepper
+                    label="Kids"
+                    value={participation.kids}
+                    onChange={(v) => onChange({ ...participation, kids: v })}
+                    min={0}
+                  />
 
                   <button
                     onClick={() => setOpen(false)}

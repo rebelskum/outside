@@ -1,15 +1,14 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import type { TripState, Participation, DateRange, TravelerGroup } from "../../../types/trip";
-import { destinations } from "../../../data/mock/destinations";
-import { lodgings } from "../../../data/mock/lodgings";
-import { activities as allActivities } from "../../../data/mock/activities";
-import { addOns } from "../../../data/mock/addons";
-import { recommendations } from "../../../data/mock/recommendations";
+import { getDestination, getLodging, getActivity, getAddOn } from "../../../data/selectors";
+import { getActiveBundle } from "../../../domain/services/bundles";
 import { calculateTotal, getBundleDiscount } from "../../../domain/services/pricing";
 import { formatCurrency, formatParticipation, getNights, participantCount } from "../../../utils/format";
 import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
 import { DateRangePicker } from "../../../components/shared/DateRangePicker";
 import { GuestPicker } from "../../../components/shared/GuestPicker";
+import { StepHeader } from "../../../components/shared/StepHeader";
+import { useClickOutside } from "../../../hooks/useClickOutside";
 
 interface ReviewStepProps {
   trip: TripState;
@@ -40,35 +39,6 @@ function PencilIcon() {
   );
 }
 
-function getActiveBundleIds(trip: TripState): { activityIds: Set<string>; addOnIds: Set<string>; title: string } | null {
-  const selectedActivityIds = trip.selectedActivities.map((a) => a.id);
-  const selectedAddOnIds = trip.selectedAddOns.map((a) => a.id);
-
-  const vibe = destinations.find((d) => d.id === trip.selectedDestinationId)?.vibe;
-
-  for (const rec of recommendations) {
-    if (rec.savings <= 0) continue;
-    if (vibe !== "mountains" && (rec.id === "ski-bundle" || rec.id === "gear-and-guide")) continue;
-
-    const relevantActivityIds = rec.activityIds.filter((id) => {
-      const activity = allActivities.find((a) => a.id === id);
-      return activity?.destinationId === trip.selectedDestinationId;
-    });
-
-    const allActivitiesPresent = relevantActivityIds.every((id) => selectedActivityIds.includes(id));
-    const allAddOnsPresent = rec.addOnIds.every((id) => selectedAddOnIds.includes(id));
-
-    if (allActivitiesPresent && allAddOnsPresent && (relevantActivityIds.length > 0 || rec.addOnIds.length > 0)) {
-      return {
-        activityIds: new Set(relevantActivityIds),
-        addOnIds: new Set(rec.addOnIds),
-        title: rec.title,
-      };
-    }
-  }
-  return null;
-}
-
 function BundleBadge({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-highlight px-2 py-0.5 text-[10px] font-medium tracking-wide text-white">
@@ -78,6 +48,77 @@ function BundleBadge({ label }: { label: string }) {
       </svg>
       {label}
     </span>
+  );
+}
+
+interface ReviewLineItemProps {
+  name: string;
+  priceLabel: string;
+  who: string;
+  isBundled: boolean;
+  isEditing: boolean;
+  participation: Participation;
+  travelers: TravelerGroup;
+  onUpdateParticipation: (p: Participation) => void;
+  onSetEditing: (editing: boolean) => void;
+  onRemove: () => void;
+  kidsOnly?: boolean;
+}
+
+function ReviewLineItem({
+  name,
+  priceLabel,
+  who,
+  isBundled,
+  isEditing,
+  participation,
+  travelers,
+  onUpdateParticipation,
+  onSetEditing,
+  onRemove,
+  kidsOnly,
+}: ReviewLineItemProps) {
+  return (
+    <li className="group rounded-lg px-3 py-3 -mx-3 hover:bg-surface/60 transition-colors">
+      <div className="flex items-start justify-between">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium">{name}</p>
+            {isBundled && <BundleBadge label="Bundled" />}
+          </div>
+          <p className="text-xs text-muted mt-0.5">{who}</p>
+        </div>
+        <span className="text-sm text-muted mt-0.5">{priceLabel}</span>
+      </div>
+      <div className={`flex items-center gap-1 mt-1.5 transition-opacity ${isEditing ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+        <ParticipationPicker
+          participation={participation}
+          travelers={travelers}
+          onChange={onUpdateParticipation}
+          onOpenChange={(open) => onSetEditing(open)}
+          kidsOnly={kidsOnly}
+          trigger={({ onClick }) => (
+            <button
+              onClick={onClick}
+              className="flex items-center gap-1 text-[11px] text-muted/60 hover:text-brand transition-colors"
+              title="Edit participants"
+            >
+              <PencilIcon />
+              <span>Edit</span>
+            </button>
+          )}
+        />
+        <span className="text-muted/30 text-[10px]">·</span>
+        <button
+          onClick={onRemove}
+          className="flex items-center gap-1 text-[11px] text-muted/60 hover:text-highlight transition-colors"
+          title="Remove"
+        >
+          <TrashIcon />
+          <span>Remove</span>
+        </button>
+      </div>
+    </li>
   );
 }
 
@@ -95,33 +136,22 @@ export function ReviewStep({
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const staySectionRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (!editingStay) return;
-    const handler = (e: MouseEvent) => {
-      if (staySectionRef.current && !staySectionRef.current.contains(e.target as Node)) {
-        setEditingStay(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [editingStay]);
+  useClickOutside(staySectionRef, editingStay, () => setEditingStay(false));
 
-  const destination = destinations.find((d) => d.id === trip.selectedDestinationId);
-  const lodging = lodgings.find((l) => l.id === trip.selectedLodgingId);
+  const destination = trip.selectedDestinationId ? getDestination(trip.selectedDestinationId) : undefined;
+  const lodging = trip.selectedLodgingId ? getLodging(trip.selectedLodgingId) : undefined;
   const total = calculateTotal(trip);
   const discount = getBundleDiscount(trip);
-  const activeBundle = getActiveBundleIds(trip);
+  const activeBundle = getActiveBundle(trip);
   const nights = getNights(trip.dateRange);
   const guestCount = trip.travelers.adults + trip.travelers.children;
 
   return (
     <div className="py-10 px-8">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Review your weekend
-      </h1>
-      <p className="mt-1 text-muted">
-        A final look before you book
-      </p>
+      <StepHeader
+        title="Review your weekend"
+        subtitle="A final look before you book"
+      />
 
       <div className="mt-8 space-y-6">
         <section ref={staySectionRef} className="group rounded-xl border border-border bg-white p-6">
@@ -162,50 +192,22 @@ export function ReviewStep({
           {trip.selectedActivities.length > 0 ? (
             <ul className="space-y-0.5">
               {trip.selectedActivities.map((item) => {
-                const activity = allActivities.find((a) => a.id === item.id);
+                const activity = getActivity(item.id);
                 if (!activity) return null;
-                const who = formatParticipation(item.participation, trip.travelers);
-                const isBundled = activeBundle?.activityIds.has(item.id);
                 return (
-                  <li key={item.id} className="group rounded-lg px-3 py-3 -mx-3 hover:bg-surface/60 transition-colors">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium">{activity.name}</p>
-                          {isBundled && activeBundle && <BundleBadge label="Bundled" />}
-                        </div>
-                        <p className="text-xs text-muted mt-0.5">{who}</p>
-                      </div>
-                      <span className="text-sm text-muted mt-0.5">{formatCurrency(activity.price)}/person</span>
-                    </div>
-                    <div className={`flex items-center gap-1 mt-1.5 transition-opacity ${editingItemId === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
-                      <ParticipationPicker
-                        participation={item.participation}
-                        travelers={trip.travelers}
-                        onChange={(p) => onUpdateActivityParticipation(item.id, p)}
-                        onOpenChange={(open) => setEditingItemId(open ? item.id : null)}
-                        trigger={({ onClick }) => (
-                          <button
-                            onClick={onClick}
-                            className="flex items-center gap-1 text-[11px] text-muted/60 hover:text-brand transition-colors"
-                            title="Edit participants"
-                          >
-                            <PencilIcon />
-                            <span>Edit</span>
-                          </button>
-                        )}
-                      />
-                      <span className="text-muted/30 text-[10px]">·</span>
-                      <button
-                        onClick={() => onRemoveActivity(item.id)}
-                        className="flex items-center gap-1 text-[11px] text-muted/60 hover:text-highlight transition-colors"
-                        title="Remove activity"
-                      >
-                        <TrashIcon />
-                        <span>Remove</span>
-                      </button>
-                    </div>
-                  </li>
+                  <ReviewLineItem
+                    key={item.id}
+                    name={activity.name}
+                    priceLabel={`${formatCurrency(activity.price)}/person`}
+                    who={formatParticipation(item.participation, trip.travelers)}
+                    isBundled={activeBundle?.activityIds.has(item.id) ?? false}
+                    isEditing={editingItemId === item.id}
+                    participation={item.participation}
+                    travelers={trip.travelers}
+                    onUpdateParticipation={(p) => onUpdateActivityParticipation(item.id, p)}
+                    onSetEditing={(editing) => setEditingItemId(editing ? item.id : null)}
+                    onRemove={() => onRemoveActivity(item.id)}
+                  />
                 );
               })}
             </ul>
@@ -219,58 +221,29 @@ export function ReviewStep({
           {trip.selectedAddOns.length > 0 ? (
             <ul className="space-y-0.5">
               {trip.selectedAddOns.map((item) => {
-                const addOn = addOns.find((a) => a.id === item.id);
+                const addOn = getAddOn(item.id);
                 if (!addOn) return null;
-                const who = formatParticipation(item.participation, trip.travelers);
                 const count = participantCount(item.participation, trip.travelers);
-                const isBundled = activeBundle?.addOnIds.has(item.id);
+                const priceLabel = addOn.price > 0
+                  ? addOn.perPerson
+                    ? `${formatCurrency(addOn.price)}/person × ${count}`
+                    : formatCurrency(addOn.price)
+                  : "Included";
                 return (
-                  <li key={item.id} className="group rounded-lg px-3 py-3 -mx-3 hover:bg-surface/60 transition-colors">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium">{addOn.name}</p>
-                          {isBundled && activeBundle && <BundleBadge label="Bundled" />}
-                        </div>
-                        <p className="text-xs text-muted mt-0.5">{who}</p>
-                      </div>
-                      <span className="text-sm text-muted mt-0.5">
-                        {addOn.price > 0
-                          ? addOn.perPerson
-                            ? `${formatCurrency(addOn.price)}/person × ${count}`
-                            : formatCurrency(addOn.price)
-                          : "Included"}
-                      </span>
-                    </div>
-                    <div className={`flex items-center gap-1 mt-1.5 transition-opacity ${editingItemId === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
-                      <ParticipationPicker
-                        participation={item.participation}
-                        travelers={trip.travelers}
-                        onChange={(p) => onUpdateAddOnParticipation(item.id, p)}
-                        onOpenChange={(open) => setEditingItemId(open ? item.id : null)}
-                        kidsOnly={item.id === "kids-club"}
-                        trigger={({ onClick }) => (
-                          <button
-                            onClick={onClick}
-                            className="flex items-center gap-1 text-[11px] text-muted/60 hover:text-brand transition-colors"
-                            title="Edit participants"
-                          >
-                            <PencilIcon />
-                            <span>Edit</span>
-                          </button>
-                        )}
-                      />
-                      <span className="text-muted/30 text-[10px]">·</span>
-                      <button
-                        onClick={() => onRemoveAddOn(item.id)}
-                        className="flex items-center gap-1 text-[11px] text-muted/60 hover:text-highlight transition-colors"
-                        title="Remove extra"
-                      >
-                        <TrashIcon />
-                        <span>Remove</span>
-                      </button>
-                    </div>
-                  </li>
+                  <ReviewLineItem
+                    key={item.id}
+                    name={addOn.name}
+                    priceLabel={priceLabel}
+                    who={formatParticipation(item.participation, trip.travelers)}
+                    isBundled={activeBundle?.addOnIds.has(item.id) ?? false}
+                    isEditing={editingItemId === item.id}
+                    participation={item.participation}
+                    travelers={trip.travelers}
+                    onUpdateParticipation={(p) => onUpdateAddOnParticipation(item.id, p)}
+                    onSetEditing={(editing) => setEditingItemId(editing ? item.id : null)}
+                    onRemove={() => onRemoveAddOn(item.id)}
+                    kidsOnly={item.id === "kids-club"}
+                  />
                 );
               })}
             </ul>
