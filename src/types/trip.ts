@@ -3,8 +3,9 @@ export type StepId = "destination" | "stay" | "activities" | "extras" | "review"
 export interface Destination {
   id: string;
   name: string;
-  tagline: string;
-  vibe: "mountains" | "desert" | "lake";
+  region: string;
+  shortDescription: string;
+  heroLabel: string;
   image: string;
 }
 
@@ -52,12 +53,14 @@ export interface AddOn {
 
 export interface Recommendation {
   id: string;
-  name: string;
-  description: string;
-  triggerType: "activity_selected" | "has_children" | "addon_selected";
-  triggerValue: string | null;
-  suggestedActivityIds: string[];
-  suggestedAddOnIds: string[];
+  title: string;
+  reason: string;
+  trigger: {
+    type: "activity_selected" | "has_children" | "addon_selected";
+    value: string | null;
+  };
+  activityIds: string[];
+  addOnIds: string[];
   bundlePrice: number | null;
   savings: number;
 }
