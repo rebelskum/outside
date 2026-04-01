@@ -20,6 +20,7 @@ export function TripBuilderPage() {
     toggleActivity,
     toggleAddOn,
     nextStep,
+    prevStep,
   } = useTrip();
 
   const total = calculateTotal(trip);
@@ -38,14 +39,18 @@ export function TripBuilderPage() {
             onSelectLodging={setLodging}
             onUpdateTravelers={setTravelers}
             onUpdateDates={setDates}
+            onBack={prevStep}
+            onNext={nextStep}
           />
         );
       case "activities":
         return (
           <ActivitiesStep
-            destinationId={trip.selectedDestinationId!}
-            selectedActivityIds={trip.selectedActivityIds}
+            trip={trip}
             onToggleActivity={toggleActivity}
+            onToggleAddOn={toggleAddOn}
+            onBack={prevStep}
+            onNext={nextStep}
           />
         );
       case "extras":
@@ -53,10 +58,12 @@ export function TripBuilderPage() {
           <ExtrasStep
             selectedAddOnIds={trip.selectedAddOnIds}
             onToggleAddOn={toggleAddOn}
+            onBack={prevStep}
+            onNext={nextStep}
           />
         );
       case "review":
-        return <ReviewStep trip={trip} />;
+        return <ReviewStep trip={trip} onBack={prevStep} />;
       default:
         return null;
     }
@@ -67,7 +74,7 @@ export function TripBuilderPage() {
       <Header />
       {showSummary && <ProgressNav currentStep={trip.currentStep} />}
 
-      <div className="mx-auto max-w-6xl px-4">
+      <div className="mx-auto max-w-6xl px-6 pb-28 lg:pb-8">
         <div className="flex gap-12">
           <main className="flex-1 min-w-0">{stepContent()}</main>
 

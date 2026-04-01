@@ -54,6 +54,13 @@ export function useTrip() {
       return next ? { ...prev, currentStep: next } : prev;
     });
 
+  const prevStep = () =>
+    setTrip((prev) => {
+      const currentIndex = STEP_ORDER.indexOf(prev.currentStep);
+      const previous = STEP_ORDER[currentIndex - 1];
+      return previous ? { ...prev, currentStep: previous } : prev;
+    });
+
   return {
     trip,
     setDestination,
@@ -64,5 +71,6 @@ export function useTrip() {
     toggleAddOn,
     goToStep,
     nextStep,
+    prevStep,
   };
 }

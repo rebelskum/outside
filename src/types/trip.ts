@@ -1,9 +1,12 @@
 export type StepId = "destination" | "stay" | "activities" | "extras" | "review";
 
+export type Vibe = "mountains" | "desert" | "coast";
+
 export interface Destination {
   id: string;
   name: string;
   region: string;
+  vibe: Vibe;
   shortDescription: string;
   heroLabel: string;
   image: string;

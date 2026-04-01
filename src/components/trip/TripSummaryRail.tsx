@@ -24,7 +24,7 @@ export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
         <h3 className="text-sm font-semibold mb-4">Your trip</h3>
 
         <div className="space-y-3 text-sm text-muted">
-          {destination && <p>{destination.name}</p>}
+          {destination && <p>{destination.name}, {destination.region}</p>}
           <p>{trip.dateRange.start} – {trip.dateRange.end}</p>
           <p>{trip.travelers.adults + trip.travelers.children} guests</p>
 
