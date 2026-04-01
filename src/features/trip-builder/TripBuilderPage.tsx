@@ -24,6 +24,7 @@ export function TripBuilderPage() {
     updateActivityParticipation,
     toggleAddOn,
     updateAddOnParticipation,
+    goToStep,
     nextStep,
     prevStep,
   } = useTrip();
@@ -99,7 +100,7 @@ export function TripBuilderPage() {
   return (
     <div className="min-h-screen bg-surface">
       <Header />
-      {showSummary && <ProgressNav currentStep={trip.currentStep} />}
+      {showSummary && <ProgressNav currentStep={trip.currentStep} onStepClick={goToStep} />}
 
       <div className="mx-auto max-w-6xl px-6 pb-28 lg:pb-8">
         <div className="flex gap-12">
