@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" fill="none">
+  <!-- Red shadow/back layer of body -->
+  <rect x="32" y="48" width="62" height="72" rx="10" fill="#CC2200" stroke="#222" stroke-width="3"/>
+  <!-- Red shadow of handle -->
+  <path d="M46 48V38c0-4 3-7 7-7h14c4 0 7 3 7 7v10" stroke="#CC2200" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <!-- Handle pillars (dark lines) -->
+  <line x1="50" y1="48" x2="50" y2="38" stroke="#222" stroke-width="3"/>
+  <line x1="70" y1="48" x2="70" y2="38" stroke="#222" stroke-width="3"/>
+  <!-- Yellow handle grip -->
+  <path d="M48 44V36c0-3 2.5-5.5 5.5-5.5h13c3 0 5.5 2.5 5.5 5.5v8" stroke="#F5B800" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M48 44V36c0-3 2.5-5.5 5.5-5.5h13c3 0 5.5 2.5 5.5 5.5v8" stroke="#222" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- Yellow main body -->
+  <rect x="25" y="44" width="62" height="72" rx="10" fill="#F5B800" stroke="#222" stroke-width="3"/>
+  <!-- Red horizontal band -->
+  <rect x="25" y="62" width="62" height="6" fill="#CC2200"/>
+  <line x1="25" y1="62" x2="87" y2="62" stroke="#222" stroke-width="1.5"/>
+  <line x1="25" y1="68" x2="87" y2="68" stroke="#222" stroke-width="1.5"/>
+  <!-- Wheels -->
+  <!-- Left wheel -->
+  <circle cx="40" cy="118" r="5" fill="#F5B800" stroke="#222" stroke-width="2.5"/>
+  <!-- Right wheel (red, behind) -->
+  <circle cx="78" cy="122" r="5" fill="#CC2200" stroke="#222" stroke-width="2.5"/>
+</svg>

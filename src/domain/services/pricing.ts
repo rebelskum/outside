@@ -3,11 +3,17 @@ import { lodgings } from "../../data/mock/lodgings";
 import { activities } from "../../data/mock/activities";
 import { addOns } from "../../data/mock/addons";
 import { recommendations } from "../../data/mock/recommendations";
+import { destinations } from "../../data/mock/destinations";
 import { getNights, participantCount } from "../../utils/format";
 
+const SKI_RECOMMENDATION_IDS = new Set(["ski-bundle", "gear-and-guide"]);
+
 export function getBundleDiscount(trip: TripState): number {
+  const vibe = destinations.find((d) => d.id === trip.selectedDestinationId)?.vibe;
+
   for (const rec of recommendations) {
     if (rec.bundlePrice === null || rec.savings <= 0) continue;
+    if (vibe !== "mountains" && SKI_RECOMMENDATION_IDS.has(rec.id)) continue;
 
     const selectedActivityIds = trip.selectedActivities.map((a) => a.id);
     const selectedAddOnIds = trip.selectedAddOns.map((a) => a.id);
