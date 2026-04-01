@@ -3,7 +3,7 @@ import { lodgings } from "../../data/mock/lodgings";
 import { activities } from "../../data/mock/activities";
 import { addOns } from "../../data/mock/addons";
 import { recommendations } from "../../data/mock/recommendations";
-import { participantCount } from "../../utils/format";
+import { getNights, participantCount } from "../../utils/format";
 
 export function getBundleDiscount(trip: TripState): number {
   for (const rec of recommendations) {
@@ -36,7 +36,7 @@ export function getBundleDiscount(trip: TripState): number {
 }
 
 export function calculateTotal(trip: TripState): number {
-  const nights = 2;
+  const nights = getNights(trip.dateRange);
 
   const lodging = lodgings.find((l) => l.id === trip.selectedLodgingId);
   const stayTotal = (lodging?.nightlyRate ?? 0) * nights;

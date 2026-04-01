@@ -3,6 +3,8 @@ import type { TravelerGroup, DateRange } from "../../../types/trip";
 import { destinations } from "../../../data/mock/destinations";
 import { lodgings } from "../../../data/mock/lodgings";
 import { StayMap } from "../../../components/trip/StayMap";
+import { DateRangePicker } from "../../../components/shared/DateRangePicker";
+import { GuestPicker } from "../../../components/shared/GuestPicker";
 
 interface StayStepProps {
   destinationId: string;
@@ -20,6 +22,8 @@ export function StayStep({
   travelers,
   dates,
   onSelectLodging,
+  onUpdateTravelers,
+  onUpdateDates,
   onBack,
   onNext,
 }: StayStepProps) {
@@ -42,12 +46,8 @@ export function StayStep({
       </p>
 
       <div className="mt-4 flex gap-3">
-        <span className="inline-flex items-center rounded-full border border-border bg-white px-4 py-2 text-sm">
-          {dates.start} – {dates.end}
-        </span>
-        <span className="inline-flex items-center rounded-full border border-border bg-white px-4 py-2 text-sm">
-          {travelers.adults + travelers.children} guests
-        </span>
+        <DateRangePicker dates={dates} onChange={onUpdateDates} />
+        <GuestPicker travelers={travelers} onChange={onUpdateTravelers} />
       </div>
 
       <h2 className="mt-10 text-lg font-medium">Choose your stay</h2>

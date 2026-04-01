@@ -162,10 +162,19 @@ function RecommendationCard({
     }
   };
 
-  // Use the first bundle activity's participation as the shared participation state
+  const handleRemove = () => {
+    for (const id of relevantActivityIds) {
+      if (selectedActivityIds.includes(id)) onToggleActivity(id);
+    }
+    for (const id of recommendation.addOnIds) {
+      if (selectedAddOnIds.includes(id)) onToggleAddOn(id);
+    }
+  };
+
+  // Use the first bundle activity or add-on's participation as the shared participation state
   const bundleItem = relevantActivityIds.length > 0
     ? trip.selectedActivities.find((a) => a.id === relevantActivityIds[0])
-    : null;
+    : trip.selectedAddOns.find((a) => recommendation.addOnIds.includes(a.id));
 
   const handleBundleParticipation = (p: Participation) => {
     for (const id of relevantActivityIds) {
@@ -178,12 +187,35 @@ function RecommendationCard({
     }
   };
 
+  const handleToggle = () => {
+    if (allAlreadyAdded) {
+      handleRemove();
+    } else {
+      handleAdd();
+    }
+  };
+
   return (
-    <div className="mt-8 rounded-2xl border border-brand/10 bg-brand/[0.02] p-6">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted mb-2">
-        Suggested for your trip
-      </p>
-      <p className="text-lg font-semibold">{recommendation.title}</p>
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleToggle}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleToggle(); } }}
+      className={`mt-8 rounded-2xl border p-6 cursor-pointer transition-all ${
+        allAlreadyAdded
+          ? "border-brand bg-brand/[0.03]"
+          : "border-brand/10 bg-brand/[0.02] hover:border-brand/30 hover:shadow-sm"
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted">
+          Suggested for your trip
+        </p>
+        <span className={`text-sm ${allAlreadyAdded ? "text-brand" : "text-muted"}`}>
+          {allAlreadyAdded ? "✓ Added" : "+ Add"}
+        </span>
+      </div>
+      <p className="text-lg font-semibold mt-2">{recommendation.title}</p>
       <p className="mt-1 text-sm text-muted leading-relaxed">
         {recommendation.reason}
       </p>
@@ -201,18 +233,8 @@ function RecommendationCard({
         )}
       </div>
 
-      {!allAlreadyAdded && (
-        <button
-          onClick={handleAdd}
-          className="mt-4 rounded-lg px-5 py-2.5 text-sm font-medium bg-brand text-white hover:opacity-90 transition-opacity"
-        >
-          Add to trip
-        </button>
-      )}
-
       {allAlreadyAdded && bundleItem && (
-        <div className="mt-4 flex items-center gap-4">
-          <span className="text-sm text-brand font-medium">✓ Added</span>
+        <div className="mt-4" onClick={(e) => e.stopPropagation()}>
           <ParticipationPicker
             participation={bundleItem.participation}
             travelers={trip.travelers}

@@ -14,10 +14,10 @@ export const recommendations: Recommendation[] = [
   {
     id: "family-adventure",
     title: "Family Adventure Pack",
-    reason: "Traveling with kids? Kids Club makes it easy to split up the day",
+    reason: "Traveling with kids? Kids Club plus discounted breakfast for the little ones",
     trigger: { type: "has_children", value: null },
     activityIds: [],
-    addOnIds: ["kids-club"],
+    addOnIds: ["kids-club", "breakfast"],
     bundlePrice: null,
     savings: 15,
   },

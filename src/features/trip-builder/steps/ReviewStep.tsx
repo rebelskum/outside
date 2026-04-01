@@ -5,7 +5,7 @@ import { activities as allActivities } from "../../../data/mock/activities";
 import { addOns } from "../../../data/mock/addons";
 import { recommendations } from "../../../data/mock/recommendations";
 import { calculateTotal, getBundleDiscount } from "../../../domain/services/pricing";
-import { formatCurrency, formatParticipation, participantCount } from "../../../utils/format";
+import { formatCurrency, formatParticipation, getNights, participantCount } from "../../../utils/format";
 import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
 
 interface ReviewStepProps {
@@ -108,7 +108,7 @@ export function ReviewStep({
           </p>
           {lodging && (
             <p className="text-sm font-medium mt-2">
-              {formatCurrency(lodging.nightlyRate)} × 2 nights
+              {formatCurrency(lodging.nightlyRate)} × {getNights(trip.dateRange)} night{getNights(trip.dateRange) !== 1 ? "s" : ""}
             </p>
           )}
         </section>
