@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { TripState, StepId, TravelerGroup, DateRange, Participation, SelectedItem } from "../types/trip";
 
 const STEP_ORDER: StepId[] = ["destination", "stay", "activities", "extras", "review"];
+const STORAGE_KEY = "outside-trip-state";
 
 const initialState: TripState = {
   currentStep: "destination",
@@ -13,12 +14,24 @@ const initialState: TripState = {
   selectedAddOns: [],
 };
 
+function loadState(): TripState {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return JSON.parse(stored) as TripState;
+  } catch { /* ignore corrupt data */ }
+  return initialState;
+}
+
 function defaultParticipation(travelers: TravelerGroup): Participation {
   return { type: "everyone", adults: travelers.adults, kids: travelers.children };
 }
 
 export function useTrip() {
-  const [trip, setTrip] = useState<TripState>(initialState);
+  const [trip, setTrip] = useState<TripState>(loadState);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trip));
+  }, [trip]);
 
   const hasDownstreamSelections = (state: TripState) =>
     state.selectedLodgingId !== null ||

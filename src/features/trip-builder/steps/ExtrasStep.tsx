@@ -1,5 +1,6 @@
 import type { TripState, Participation } from "../../../types/trip";
 import { addOns } from "../../../data/mock/addons";
+import { destinations } from "../../../data/mock/destinations";
 import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
 
 const PARTICIPATION_CATEGORIES = new Set(["Dining", "Family", "Gear"]);
@@ -22,9 +23,14 @@ export function ExtrasStep({
   onNext,
 }: ExtrasStepProps) {
   const destinationId = trip.selectedDestinationId!;
+  const vibe = destinations.find((d) => d.id === destinationId)?.vibe;
   const hasKids = trip.travelers.children > 0;
+  const isSkiVibe = vibe === "mountains";
   const globalAddOns = addOns.filter(
-    (a) => a.destinationId === null && (a.id !== "kids-club" || hasKids)
+    (a) =>
+      a.destinationId === null &&
+      (a.id !== "kids-club" || hasKids) &&
+      (a.id !== "equipment-rental" || isSkiVibe)
   );
   const diningAddOns = addOns.filter(
     (a) => a.destinationId === destinationId && a.category === "Dining"

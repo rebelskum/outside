@@ -44,8 +44,11 @@ function getActiveBundleIds(trip: TripState): { activityIds: Set<string>; addOnI
   const selectedActivityIds = trip.selectedActivities.map((a) => a.id);
   const selectedAddOnIds = trip.selectedAddOns.map((a) => a.id);
 
+  const vibe = destinations.find((d) => d.id === trip.selectedDestinationId)?.vibe;
+
   for (const rec of recommendations) {
     if (rec.savings <= 0) continue;
+    if (vibe !== "mountains" && (rec.id === "ski-bundle" || rec.id === "gear-and-guide")) continue;
 
     const relevantActivityIds = rec.activityIds.filter((id) => {
       const activity = allActivities.find((a) => a.id === id);
