@@ -81,7 +81,7 @@ export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
 
         <button
           onClick={onContinue}
-          className="mt-4 w-full rounded-lg bg-brand text-white py-3 text-sm font-medium hover:opacity-90 transition-opacity"
+          className="mt-4 w-full rounded-lg bg-accent text-brand py-3 text-sm font-medium hover:bg-brand hover:text-white transition-colors"
         >
           Continue
         </button>

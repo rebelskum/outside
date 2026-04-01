@@ -101,7 +101,7 @@ export function StayStep({
         </button>
         <button
           onClick={onNext}
-          className="rounded-lg bg-brand text-white px-6 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
+          className="rounded-lg bg-accent text-brand px-6 py-2.5 text-sm font-medium hover:bg-brand hover:text-white transition-colors"
         >
           Continue
         </button>

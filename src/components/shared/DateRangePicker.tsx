@@ -183,7 +183,7 @@ export function DateRangePicker({ dates, onChange }: DateRangePickerProps) {
             <button
               onClick={handleClose}
               disabled={!start || !end}
-              className="rounded-lg bg-brand text-white px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
+              className="rounded-lg bg-accent text-brand px-5 py-2.5 text-sm font-medium hover:bg-brand hover:text-white transition-colors disabled:opacity-40"
             >
               Close
             </button>

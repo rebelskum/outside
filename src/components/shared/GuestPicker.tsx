@@ -92,7 +92,7 @@ export function GuestPicker({ travelers, onChange }: GuestPickerProps) {
 
           <button
             onClick={() => setOpen(false)}
-            className="mt-4 w-full rounded-lg bg-brand text-white py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+            className="mt-4 w-full rounded-lg bg-accent text-brand py-2 text-sm font-medium hover:bg-brand hover:text-white transition-colors"
           >
             Done
           </button>

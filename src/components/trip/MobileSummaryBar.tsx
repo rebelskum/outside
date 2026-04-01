@@ -11,7 +11,7 @@ export function MobileSummaryBar({ total, onViewTrip }: MobileSummaryBarProps) {
       </div>
       <button
         onClick={onViewTrip}
-        className="rounded-lg bg-brand text-white px-6 py-3 text-sm font-medium hover:opacity-90 transition-opacity"
+        className="rounded-lg bg-accent text-brand px-6 py-3 text-sm font-medium hover:bg-brand hover:text-white transition-colors"
       >
         View trip
       </button>

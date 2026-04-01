@@ -63,8 +63,8 @@ export function StayMap({ lodgings, highlightedId, onPinClick }: StayMapProps) {
                 shadow-sm transition-all duration-200 cursor-pointer whitespace-nowrap
                 ${
                   isHighlighted
-                    ? "bg-brand text-white scale-105 shadow-md"
-                    : "bg-white text-brand/80 hover:bg-brand hover:text-white hover:shadow-md"
+                    ? "bg-accent text-brand scale-105 shadow-md"
+                    : "bg-white text-brand/80 hover:bg-accent hover:text-brand hover:shadow-md"
                 }
               `}
             >

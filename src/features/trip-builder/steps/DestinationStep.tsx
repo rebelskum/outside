@@ -151,7 +151,7 @@ export function DestinationStep({ onSelect, needsConfirmation }: DestinationStep
                   onSelect(pendingDestinationId);
                   setPendingDestinationId(null);
                 }}
-                className="rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+                className="rounded-lg bg-accent text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-white transition-colors"
               >
                 Change destination
               </button>

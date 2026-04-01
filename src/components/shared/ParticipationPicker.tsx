@@ -86,7 +86,7 @@ export function ParticipationPicker({
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="mt-1 w-full rounded-lg bg-brand text-white py-1.5 text-xs font-medium hover:opacity-90 transition-opacity"
+                className="mt-1 w-full rounded-lg bg-accent text-brand py-1.5 text-xs font-medium hover:bg-brand hover:text-white transition-colors"
               >
                 Done
               </button>
@@ -173,7 +173,7 @@ export function ParticipationPicker({
 
                   <button
                     onClick={() => setOpen(false)}
-                    className="mt-1 w-full rounded-lg bg-brand text-white py-1.5 text-xs font-medium hover:opacity-90 transition-opacity"
+                    className="mt-1 w-full rounded-lg bg-accent text-brand py-1.5 text-xs font-medium hover:bg-brand hover:text-white transition-colors"
                   >
                     Done
                   </button>

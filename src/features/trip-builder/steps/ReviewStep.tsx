@@ -71,7 +71,7 @@ function getActiveBundleIds(trip: TripState): { activityIds: Set<string>; addOnI
 
 function BundleBadge({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium tracking-wide text-emerald-600">
+    <span className="inline-flex items-center gap-1 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-medium tracking-wide text-white">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
         <line x1="7" y1="7" x2="7.01" y2="7" />
@@ -280,8 +280,8 @@ export function ReviewStep({
 
           {discount > 0 && (
             <div className="mt-3 pt-3 border-t border-border/50 flex justify-between text-sm">
-              <span className="text-emerald-600 font-medium">Bundle discount</span>
-              <span className="text-emerald-600">−{formatCurrency(discount)}</span>
+              <span className="text-red-500 font-medium">Bundle discount</span>
+              <span className="text-red-500">−{formatCurrency(discount)}</span>
             </div>
           )}
         </section>
@@ -300,7 +300,7 @@ export function ReviewStep({
         </div>
       </div>
 
-      <button className="mt-6 w-full rounded-lg bg-brand text-white py-3.5 text-sm font-medium hover:opacity-90 transition-opacity">
+      <button className="mt-6 w-full rounded-lg bg-accent text-brand py-3.5 text-sm font-medium hover:bg-brand hover:text-white transition-colors">
         Reserve trip
       </button>
     </div>
