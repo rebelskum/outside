@@ -112,7 +112,7 @@ export function TripBuilderPage() {
     <div className="relative min-h-screen bg-surface">
       {/* Full-width hero image behind destination card */}
       {isDestinationStep && (
-        <div className="absolute inset-x-0 top-0 -z-0 h-[calc(100vh-96px)] overflow-hidden">
+        <div className="absolute inset-0 -z-0 overflow-hidden">
           <img
             src={heroImage}
             alt=""
