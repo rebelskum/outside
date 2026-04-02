@@ -84,6 +84,7 @@ export function StayStep({
             onClick={() => onSelectLodging(lodge.id)}
             onMouseEnter={() => setHighlightedId(lodge.id)}
             onMouseLeave={() => setHighlightedId(null)}
+            aria-label={`Select ${lodge.name}`}
             className={`w-full rounded-xl border p-5 text-left transition-all ${cardStyle(lodge.id)}`}
           >
             <div className="flex gap-5">

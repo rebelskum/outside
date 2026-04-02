@@ -42,6 +42,15 @@ npm run build
 npm run preview
 ```
 
+### Tests
+
+```bash
+npm test            # single run
+npm run test:watch  # watch mode
+```
+
+Tests use Vitest + React Testing Library and cover core domain logic (pricing, recommendations, trip state management) plus one integration test for the main booking flow.
+
 ## Project Structure
 
 ```
