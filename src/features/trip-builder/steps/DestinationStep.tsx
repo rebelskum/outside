@@ -100,14 +100,14 @@ export function DestinationStep({ onSelect, needsConfirmation }: DestinationStep
                   <button
                     key={vibe.id}
                     onClick={() => setSelectedVibe(active ? null : vibe.id)}
-                    className={`rounded-2xl border p-6 text-center transition-all ${
+                    className={`rounded-2xl border px-3 py-6 sm:p-6 text-center overflow-hidden transition-all ${
                       active
                         ? "border-brand bg-brand/[0.03] shadow-sm"
                         : "border-border bg-white hover:border-brand/20 hover:shadow-sm"
                     }`}
                   >
                     <span className="text-2xl">{vibe.emoji}</span>
-                    <p className="mt-2 text-sm font-medium">{vibe.label}</p>
+                    <p className="mt-2 text-xs sm:text-sm font-medium">{vibe.label}</p>
                   </button>
                 );
               })}
