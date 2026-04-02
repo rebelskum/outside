@@ -56,6 +56,7 @@ function BundleBadge({ label }: { label: string }) {
 interface ReviewLineItemProps {
   name: string;
   priceLabel: string;
+  lineTotal: number | null;
   who: string;
   isBundled: boolean;
   isEditing: boolean;
@@ -70,6 +71,7 @@ interface ReviewLineItemProps {
 function ReviewLineItem({
   name,
   priceLabel,
+  lineTotal,
   who,
   isBundled,
   isEditing,
@@ -90,7 +92,12 @@ function ReviewLineItem({
           </div>
           <p className="text-xs text-muted mt-0.5">{who}</p>
         </div>
-        <span className="text-sm text-muted mt-0.5">{priceLabel}</span>
+        <div className="text-right mt-0.5">
+          <span className="text-xs text-muted">{priceLabel}</span>
+          {lineTotal != null && (
+            <p className="text-sm font-medium mt-0.5">{formatCurrency(lineTotal)}</p>
+          )}
+        </div>
       </div>
       <div className={`flex items-center gap-1 mt-1.5 transition-opacity ${isEditing ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
         <ParticipationPicker
@@ -149,6 +156,21 @@ export function ReviewStep({
   const nights = getNights(trip.dateRange);
   const guestCount = trip.travelers.adults + trip.travelers.children;
 
+  const activitiesSectionTotal = trip.selectedActivities.reduce((sum, item) => {
+    const activity = getActivity(item.id);
+    if (!activity) return sum;
+    return sum + activity.price * participantCount(item.participation, trip.travelers);
+  }, 0);
+
+  const extrasSectionTotal = trip.selectedAddOns.reduce((sum, item) => {
+    const addOn = getAddOn(item.id);
+    if (!addOn) return sum;
+    if (addOn.perPerson) {
+      return sum + addOn.price * participantCount(item.participation, trip.travelers);
+    }
+    return sum + addOn.price;
+  }, 0);
+
   return (
     <div className="py-10 px-8">
       <StepHeader
@@ -193,27 +215,40 @@ export function ReviewStep({
         <section className="rounded-xl border border-border bg-white p-6">
           <h2 className="text-sm font-semibold text-muted uppercase tracking-wide mb-3">Activities</h2>
           {trip.selectedActivities.length > 0 ? (
-            <ul className="space-y-0.5">
-              {trip.selectedActivities.map((item) => {
-                const activity = getActivity(item.id);
-                if (!activity) return null;
-                return (
-                  <ReviewLineItem
-                    key={item.id}
-                    name={activity.name}
-                    priceLabel={`${formatCurrency(activity.price)}/person`}
-                    who={formatParticipation(item.participation, trip.travelers)}
-                    isBundled={activeBundle?.activityIds.has(item.id) ?? false}
-                    isEditing={editingItemId === item.id}
-                    participation={item.participation}
-                    travelers={trip.travelers}
-                    onUpdateParticipation={(p) => onUpdateActivityParticipation(item.id, p)}
-                    onSetEditing={(editing) => setEditingItemId(editing ? item.id : null)}
-                    onRemove={() => onRemoveActivity(item.id)}
-                  />
-                );
-              })}
-            </ul>
+            <>
+              <ul className="space-y-0.5">
+                {trip.selectedActivities.map((item) => {
+                  const activity = getActivity(item.id);
+                  if (!activity) return null;
+                  const count = participantCount(item.participation, trip.travelers);
+                  const isBundled = activeBundle?.activityIds.has(item.id) ?? false;
+                  const rawTotal = activity.price * count;
+                  const lineTotal = count > 1 ? rawTotal : null;
+                  return (
+                    <ReviewLineItem
+                      key={item.id}
+                      name={activity.name}
+                      priceLabel={`${formatCurrency(activity.price)}/person`}
+                      lineTotal={lineTotal}
+                      who={formatParticipation(item.participation, trip.travelers)}
+                      isBundled={isBundled}
+                      isEditing={editingItemId === item.id}
+                      participation={item.participation}
+                      travelers={trip.travelers}
+                      onUpdateParticipation={(p) => onUpdateActivityParticipation(item.id, p)}
+                      onSetEditing={(editing) => setEditingItemId(editing ? item.id : null)}
+                      onRemove={() => onRemoveActivity(item.id)}
+                    />
+                  );
+                })}
+              </ul>
+              {trip.selectedActivities.length > 1 && (
+                <div className="mt-3 pt-3 border-t border-border/50 flex justify-between text-sm">
+                  <span className="text-muted font-medium">Activities total</span>
+                  <span className="font-medium">{formatCurrency(activitiesSectionTotal)}</span>
+                </div>
+              )}
+            </>
           ) : (
             <button
               onClick={() => onGoToStep?.("activities")}
@@ -227,30 +262,50 @@ export function ReviewStep({
         <section className="rounded-xl border border-border bg-white p-6">
           <h2 className="text-sm font-semibold text-muted uppercase tracking-wide mb-3">Extras</h2>
           {trip.selectedAddOns.length > 0 ? (
-            <ul className="space-y-0.5">
-              {trip.selectedAddOns.map((item) => {
-                const addOn = getAddOn(item.id);
-                if (!addOn) return null;
-                const count = participantCount(item.participation, trip.travelers);
-                const priceLabel = formatAddOnPrice(addOn, addOn.perPerson ? count : undefined);
-                return (
-                  <ReviewLineItem
-                    key={item.id}
-                    name={addOn.name}
-                    priceLabel={priceLabel}
-                    who={formatParticipation(item.participation, trip.travelers)}
-                    isBundled={activeBundle?.addOnIds.has(item.id) ?? false}
-                    isEditing={editingItemId === item.id}
-                    participation={item.participation}
-                    travelers={trip.travelers}
-                    onUpdateParticipation={(p) => onUpdateAddOnParticipation(item.id, p)}
-                    onSetEditing={(editing) => setEditingItemId(editing ? item.id : null)}
-                    onRemove={() => onRemoveAddOn(item.id)}
-                    kidsOnly={item.id === KIDS_CLUB_ID}
-                  />
-                );
-              })}
-            </ul>
+            <>
+              <ul className="space-y-0.5">
+                {trip.selectedAddOns.map((item) => {
+                  const addOn = getAddOn(item.id);
+                  if (!addOn) return null;
+                  const count = participantCount(item.participation, trip.travelers);
+                  const isBundled = activeBundle?.addOnIds.has(item.id) ?? false;
+                  const priceLabel = formatAddOnPrice(addOn);
+                  let lineTotal: number | null = null;
+                  if (addOn.perPerson && count > 1 && addOn.price > 0) {
+                    lineTotal = addOn.price * count;
+                  }
+                  return (
+                    <ReviewLineItem
+                      key={item.id}
+                      name={addOn.name}
+                      priceLabel={priceLabel}
+                      lineTotal={lineTotal}
+                      who={formatParticipation(item.participation, trip.travelers)}
+                      isBundled={isBundled}
+                      isEditing={editingItemId === item.id}
+                      participation={item.participation}
+                      travelers={trip.travelers}
+                      onUpdateParticipation={(p) => onUpdateAddOnParticipation(item.id, p)}
+                      onSetEditing={(editing) => setEditingItemId(editing ? item.id : null)}
+                      onRemove={() => onRemoveAddOn(item.id)}
+                      kidsOnly={item.id === KIDS_CLUB_ID}
+                    />
+                  );
+                })}
+              </ul>
+              {discount > 0 && (
+                <div className="mt-3 pt-3 border-t border-border/50 flex justify-between text-sm">
+                  <span className="text-bundle font-medium">Bundle discount</span>
+                  <span className="text-bundle">−{formatCurrency(discount)}</span>
+                </div>
+              )}
+              {(trip.selectedAddOns.length > 1 || discount > 0) && (
+                <div className={`flex justify-between text-sm ${discount > 0 ? "mt-1" : "mt-3 pt-3 border-t border-border/50"}`}>
+                  <span className="text-muted font-medium">Extras total</span>
+                  <span className="font-medium">{formatCurrency(extrasSectionTotal - discount)}</span>
+                </div>
+              )}
+            </>
           ) : (
             <button
               onClick={() => onGoToStep?.("extras")}
@@ -258,13 +313,6 @@ export function ReviewStep({
             >
               + Extras
             </button>
-          )}
-
-          {discount > 0 && (
-            <div className="mt-3 pt-3 border-t border-border/50 flex justify-between text-sm">
-              <span className="text-bundle font-medium">Bundle discount</span>
-              <span className="text-bundle">−{formatCurrency(discount)}</span>
-            </div>
           )}
         </section>
       </div>
