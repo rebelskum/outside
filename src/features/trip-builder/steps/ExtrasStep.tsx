@@ -1,6 +1,8 @@
 import type { TripState, Participation } from "../../../types/trip";
 import { addOns } from "../../../data/mock/addons";
 import { getDestination } from "../../../data/selectors";
+import { formatCurrency } from "../../../utils/format";
+import { KIDS_CLUB_ID } from "../../../domain/constants";
 import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
 import { SelectableCard } from "../../../components/shared/SelectableCard";
 import { StepHeader } from "../../../components/shared/StepHeader";
@@ -31,7 +33,7 @@ export function ExtrasStep({
   const globalAddOns = addOns.filter(
     (a) =>
       a.destinationId === null &&
-      (a.id !== "kids-club" || hasKids) &&
+      (a.id !== KIDS_CLUB_ID || hasKids) &&
       (a.id !== "equipment-rental" || isSkiVibe)
   );
   const diningAddOns = addOns.filter(
@@ -60,7 +62,7 @@ export function ExtrasStep({
                 <div className="flex items-center gap-3">
                   {addon.price > 0 && (
                     <span className="text-sm text-muted">
-                      ${addon.price}{addon.perPerson ? "/person" : ""}
+                      {formatCurrency(addon.price)}{addon.perPerson ? "/person" : ""}
                     </span>
                   )}
                   <span className={`text-sm ${selected ? "text-brand" : "text-muted"}`}>
@@ -73,7 +75,7 @@ export function ExtrasStep({
                   participation={selectedItem.participation}
                   travelers={trip.travelers}
                   onChange={(p) => onUpdateAddOnParticipation(addon.id, p)}
-                  kidsOnly={addon.id === "kids-club"}
+                  kidsOnly={addon.id === KIDS_CLUB_ID}
                 />
               ) : undefined}
             >

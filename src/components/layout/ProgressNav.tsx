@@ -1,14 +1,5 @@
 import type { StepId } from "../../types/trip";
-
-const STEPS: { id: StepId; label: string }[] = [
-  { id: "destination", label: "Destination" },
-  { id: "stay", label: "Stay" },
-  { id: "activities", label: "Activities" },
-  { id: "extras", label: "Extras" },
-  { id: "review", label: "Review" },
-];
-
-const STEP_ORDER: StepId[] = STEPS.map((s) => s.id);
+import { STEPS, STEP_ORDER } from "../../config/steps";
 
 interface ProgressNavProps {
   currentStep: StepId;

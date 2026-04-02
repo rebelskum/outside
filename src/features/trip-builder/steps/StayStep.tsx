@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { TravelerGroup, DateRange } from "../../../types/trip";
 import { getDestination, getLodgingsForDestination } from "../../../data/selectors";
+import { formatCurrency } from "../../../utils/format";
 import { OptimizedImage, preloadImages } from "../../../components/shared/OptimizedImage";
 import { StayMap } from "../../../components/trip/StayMap";
 import { DateRangePicker } from "../../../components/shared/DateRangePicker";
@@ -95,7 +96,7 @@ export function StayStep({
                 <p className="font-medium">{lodge.name}</p>
                 <p className="text-sm text-muted mt-1">{lodge.shortDescription}</p>
                 <div className="flex items-center gap-3 mt-2">
-                  <p className="text-sm font-medium">${lodge.nightlyRate} / night</p>
+                  <p className="text-sm font-medium">{formatCurrency(lodge.nightlyRate)} / night</p>
                   <span className="text-xs text-muted/70">·</span>
                   <span className="text-xs text-muted">{lodge.locationLabel}</span>
                 </div>

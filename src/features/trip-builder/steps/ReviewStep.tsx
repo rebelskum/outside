@@ -3,7 +3,8 @@ import type { TripState, Participation, DateRange, TravelerGroup } from "../../.
 import { getDestination, getLodging, getActivity, getAddOn } from "../../../data/selectors";
 import { getActiveBundle } from "../../../domain/services/bundles";
 import { calculateTotal, getBundleDiscount } from "../../../domain/services/pricing";
-import { formatCurrency, formatParticipation, getNights, participantCount } from "../../../utils/format";
+import { formatCurrency, formatParticipation, formatAddOnPrice, getNights, participantCount, pluralize } from "../../../utils/format";
+import { KIDS_CLUB_ID } from "../../../domain/constants";
 import { ParticipationPicker } from "../../../components/shared/ParticipationPicker";
 import { DateRangePicker } from "../../../components/shared/DateRangePicker";
 import { GuestPicker } from "../../../components/shared/GuestPicker";
@@ -161,11 +162,11 @@ export function ReviewStep({
             {destination?.name}, {destination?.region} · {trip.dateRange.start} – {trip.dateRange.end}
           </p>
           <p className="text-sm text-muted">
-            {guestCount} guest{guestCount !== 1 ? "s" : ""}
+            {pluralize(guestCount, "guest")}
           </p>
           {lodging && (
             <p className="text-sm font-medium mt-2">
-              {formatCurrency(lodging.nightlyRate)} × {nights} night{nights !== 1 ? "s" : ""}
+              {formatCurrency(lodging.nightlyRate)} × {pluralize(nights, "night")}
             </p>
           )}
 
@@ -224,11 +225,7 @@ export function ReviewStep({
                 const addOn = getAddOn(item.id);
                 if (!addOn) return null;
                 const count = participantCount(item.participation, trip.travelers);
-                const priceLabel = addOn.price > 0
-                  ? addOn.perPerson
-                    ? `${formatCurrency(addOn.price)}/person × ${count}`
-                    : formatCurrency(addOn.price)
-                  : "Included";
+                const priceLabel = formatAddOnPrice(addOn, addOn.perPerson ? count : undefined);
                 return (
                   <ReviewLineItem
                     key={item.id}
@@ -242,7 +239,7 @@ export function ReviewStep({
                     onUpdateParticipation={(p) => onUpdateAddOnParticipation(item.id, p)}
                     onSetEditing={(editing) => setEditingItemId(editing ? item.id : null)}
                     onRemove={() => onRemoveAddOn(item.id)}
-                    kidsOnly={item.id === "kids-club"}
+                    kidsOnly={item.id === KIDS_CLUB_ID}
                   />
                 );
               })}

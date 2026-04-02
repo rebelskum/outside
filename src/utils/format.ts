@@ -1,4 +1,4 @@
-import type { DateRange, Participation, TravelerGroup } from "../types/trip";
+import type { AddOn, DateRange, Participation, TravelerGroup } from "../types/trip";
 
 export function getNights(dateRange: DateRange): number {
   const parse = (str: string) => {
@@ -30,4 +30,12 @@ export function formatParticipation(p: Participation, travelers: TravelerGroup):
 export function participantCount(p: Participation, travelers: TravelerGroup): number {
   if (p.type === "everyone") return travelers.adults + travelers.children;
   return p.adults + p.kids;
+}
+
+export function formatAddOnPrice(addOn: AddOn, count?: number): string {
+  if (addOn.price <= 0) return "Included";
+  if (!addOn.perPerson) return formatCurrency(addOn.price);
+  return count != null
+    ? `${formatCurrency(addOn.price)}/person × ${count}`
+    : `${formatCurrency(addOn.price)}/person`;
 }

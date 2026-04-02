@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { TripState, StepId, TravelerGroup, DateRange, Participation, SelectedItem } from "../types/trip";
-
-const STEP_ORDER: StepId[] = ["destination", "stay", "activities", "extras", "review"];
+import { STEP_ORDER } from "../config/steps";
+import { KIDS_CLUB_ID } from "../domain/constants";
 const STORAGE_KEY = "outside-trip-state";
 
 const initialState: TripState = {
@@ -48,6 +48,27 @@ function updateItemParticipation(
   return items.map((a) => (a.id === id ? { ...a, participation } : a));
 }
 
+function clampParticipation(p: Participation, travelers: TravelerGroup): Participation {
+  if (p.type === "everyone") {
+    return { type: "everyone", adults: travelers.adults, kids: travelers.children };
+  }
+  return {
+    type: "partial",
+    adults: Math.min(p.adults, travelers.adults),
+    kids: Math.min(p.kids, travelers.children),
+  };
+}
+
+function normalizeItemsForTravelers(
+  items: SelectedItem[],
+  travelers: TravelerGroup,
+): SelectedItem[] {
+  return items.map((item) => ({
+    ...item,
+    participation: clampParticipation(item.participation, travelers),
+  }));
+}
+
 export function useTrip() {
   const [trip, setTrip] = useState<TripState>(loadState);
 
@@ -82,7 +103,18 @@ export function useTrip() {
     setTrip((prev) => ({ ...prev, selectedLodgingId: id }));
 
   const setTravelers = (travelers: TravelerGroup) =>
-    setTrip((prev) => ({ ...prev, travelers }));
+    setTrip((prev) => {
+      let addOns = normalizeItemsForTravelers(prev.selectedAddOns, travelers);
+      if (travelers.children === 0) {
+        addOns = addOns.filter((item) => item.id !== KIDS_CLUB_ID);
+      }
+      return {
+        ...prev,
+        travelers,
+        selectedActivities: normalizeItemsForTravelers(prev.selectedActivities, travelers),
+        selectedAddOns: addOns,
+      };
+    });
 
   const setDates = (dateRange: DateRange) =>
     setTrip((prev) => ({ ...prev, dateRange }));
@@ -105,7 +137,7 @@ export function useTrip() {
     setTrip((prev) => ({
       ...prev,
       selectedAddOns: toggleItem(prev.selectedAddOns, id, () =>
-        id === "kids-club"
+        id === KIDS_CLUB_ID
           ? { type: "partial" as const, adults: 0, kids: prev.travelers.children }
           : defaultParticipation(prev.travelers),
       ),
@@ -124,11 +156,22 @@ export function useTrip() {
         : { ...prev, seenRecommendationIds: [...prev.seenRecommendationIds, id] },
     );
 
+  const canAdvancePast = (step: StepId, state: TripState): boolean => {
+    if (step === "stay" && !state.selectedLodgingId) return false;
+    return true;
+  };
+
   const goToStep = (step: StepId) =>
-    setTrip((prev) => ({ ...prev, currentStep: step }));
+    setTrip((prev) => {
+      const targetIdx = STEP_ORDER.indexOf(step);
+      const currentIdx = STEP_ORDER.indexOf(prev.currentStep);
+      if (targetIdx > currentIdx && !canAdvancePast(prev.currentStep, prev)) return prev;
+      return { ...prev, currentStep: step };
+    });
 
   const nextStep = () =>
     setTrip((prev) => {
+      if (!canAdvancePast(prev.currentStep, prev)) return prev;
       const next = STEP_ORDER[STEP_ORDER.indexOf(prev.currentStep) + 1];
       return next ? { ...prev, currentStep: next } : prev;
     });

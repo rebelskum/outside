@@ -30,8 +30,11 @@ export function TripBuilderPage() {
     prevStep,
   } = useTrip();
 
+  const isDestinationStep = trip.currentStep === "destination";
+  const isReviewStep = trip.currentStep === "review";
   const total = calculateTotal(trip);
-  const showSummary = trip.currentStep !== "destination";
+  const showProgressNav = !isDestinationStep;
+  const showSummaryRail = !isDestinationStep && !isReviewStep;
 
   const stepContent = () => {
     switch (trip.currentStep) {
@@ -97,8 +100,6 @@ export function TripBuilderPage() {
     }
   };
 
-  const isDestinationStep = trip.currentStep === "destination";
-
   const heroImage = useMemo(() => {
     const heroes = [
       "/hero-destination.jpg",
@@ -124,19 +125,19 @@ export function TripBuilderPage() {
 
       <div className="relative z-10 flex flex-col min-h-screen">
       <Header />
-      {showSummary && <ProgressNav currentStep={trip.currentStep} onStepClick={goToStep} />}
+      {showProgressNav && <ProgressNav currentStep={trip.currentStep} onStepClick={goToStep} />}
 
       <div className="flex-1 mx-auto max-w-6xl w-full px-6 pb-28 lg:pb-8">
         <div className="flex gap-12">
           <main className="flex-1 min-w-0">{stepContent()}</main>
 
-          {showSummary && (
-            <TripSummaryRail trip={trip} onContinue={nextStep} />
+          {showSummaryRail && (
+            <TripSummaryRail trip={trip} onReserve={() => goToStep("review")} />
           )}
         </div>
       </div>
 
-      {showSummary && (
+      {showSummaryRail && (
         <MobileSummaryBar total={total} onViewTrip={() => {}} />
       )}
 

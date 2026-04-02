@@ -5,10 +5,10 @@ import { formatCurrency, formatParticipation } from "../../utils/format";
 
 interface TripSummaryRailProps {
   trip: TripState;
-  onContinue: () => void;
+  onReserve: () => void;
 }
 
-export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
+export function TripSummaryRail({ trip, onReserve }: TripSummaryRailProps) {
   const destination = trip.selectedDestinationId ? getDestination(trip.selectedDestinationId) : undefined;
   const lodging = trip.selectedLodgingId ? getLodging(trip.selectedLodgingId) : undefined;
   const total = calculateTotal(trip);
@@ -77,10 +77,15 @@ export function TripSummaryRail({ trip, onContinue }: TripSummaryRailProps) {
         </div>
 
         <button
-          onClick={onContinue}
-          className="mt-4 w-full rounded-lg bg-accent text-brand py-3 text-sm font-medium hover:bg-brand hover:text-white transition-colors"
+          onClick={onReserve}
+          disabled={!lodging}
+          className={`mt-4 w-full rounded-lg py-3 text-sm font-medium transition-colors ${
+            lodging
+              ? "bg-accent text-brand hover:bg-brand hover:text-white"
+              : "bg-gray-100 text-gray-300 cursor-not-allowed"
+          }`}
         >
-          Continue
+          Reserve trip
         </button>
       </div>
     </aside>

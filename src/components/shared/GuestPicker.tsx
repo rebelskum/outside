@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import type { TravelerGroup } from "../../types/trip";
+import { pluralize } from "../../utils/format";
 import { useClickOutside } from "../../hooks/useClickOutside";
 import { Stepper } from "./Stepper";
 
@@ -17,8 +18,8 @@ export function GuestPicker({ travelers, onChange }: GuestPickerProps) {
   const total = travelers.adults + travelers.children;
   const label =
     travelers.children > 0
-      ? `${travelers.adults} adult${travelers.adults !== 1 ? "s" : ""}, ${travelers.children} kid${travelers.children !== 1 ? "s" : ""}`
-      : `${total} guest${total !== 1 ? "s" : ""}`;
+      ? `${pluralize(travelers.adults, "adult")}, ${pluralize(travelers.children, "kid")}`
+      : pluralize(total, "guest");
 
   return (
     <div className="relative" ref={ref}>

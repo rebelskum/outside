@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Participation, TravelerGroup } from "../../types/trip";
+import { pluralize } from "../../utils/format";
 import { Stepper } from "./Stepper";
 
 interface ParticipationPickerProps {
@@ -28,11 +29,11 @@ export function ParticipationPicker({
   const isCustom = participation.type === "partial";
 
   const label = kidsOnly
-    ? `${participation.kids} kid${participation.kids !== 1 ? "s" : ""}`
+    ? pluralize(participation.kids, "kid")
     : isCustom
       ? [
-          participation.adults > 0 && `${participation.adults} adult${participation.adults !== 1 ? "s" : ""}`,
-          participation.kids > 0 && `${participation.kids} kid${participation.kids !== 1 ? "s" : ""}`,
+          participation.adults > 0 && pluralize(participation.adults, "adult"),
+          participation.kids > 0 && pluralize(participation.kids, "kid"),
         ]
           .filter(Boolean)
           .join(", ")
