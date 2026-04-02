@@ -139,7 +139,11 @@ export function TripBuilderPage() {
       </div>
 
       {showSummaryRail && (
-        <MobileSummaryBar total={total} onViewTrip={() => {}} />
+        <MobileSummaryBar
+          total={total}
+          onViewTrip={() => goToStep("review")}
+          disabled={!trip.selectedLodgingId}
+        />
       )}
 
       <Footer />
