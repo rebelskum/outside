@@ -54,6 +54,8 @@ Destination search uses mock data with a curated set of supported destinations. 
 
 **Lightweight map.** The stay step includes a stylized area map with interactive price pins. Hovering a pin highlights the corresponding card, and vice versa. It communicates spatial context without the weight of a real map integration.
 
+**Responsive layout.** On desktop, the main content area sits alongside a sticky summary rail on the right. On mobile, the layout stacks vertically and the summary rail is replaced by a fixed bottom bar showing the running total and a "View trip" button. The destination step uses a full-bleed hero image that scales naturally across breakpoints.
+
 **Calm, spacious visual design.** Outside-inspired UI with generous whitespace, soft borders, subtle hover states, rounded cards, and restrained color. The accent yellow and dark brand palette keep the interface warm but professional. Tailwind v4 with a custom `@theme` defines the reoccuring color system.
 
 **Review step as a real editing surface.** The review isn't just a static receipt. Dates, guests, and participation can all be adjusted inline. Items can be removed. Bundle discounts show clearly. Empty sections link back to the relevant step.
