@@ -1,6 +1,6 @@
 # travelr
 
-A high-fidelity functional prototype for a guided outdoor trip booking experience — built as a UX Engineer take-home for Outside Interactive.
+A high-fidelity functional prototype for a guided outdoor trip booking experience
 
 **[Live demo →](https://jette-travelr.vercel.app/)**
 
