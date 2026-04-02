@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { TripState, StepId, TravelerGroup, DateRange, Participation, SelectedItem } from "../types/trip";
 import { STEP_ORDER } from "../config/steps";
 import { KIDS_CLUB_ID } from "../domain/constants";
+
 const STORAGE_KEY = "outside-trip-state";
 
 const initialState: TripState = {
@@ -14,17 +15,6 @@ const initialState: TripState = {
   selectedAddOns: [],
   seenRecommendationIds: [],
 };
-
-function loadState(): TripState {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return { ...initialState, ...parsed } as TripState;
-    }
-  } catch { /* ignore corrupt data */ }
-  return initialState;
-}
 
 function defaultParticipation(travelers: TravelerGroup): Participation {
   return { type: "everyone", adults: travelers.adults, kids: travelers.children };
@@ -69,11 +59,21 @@ function normalizeItemsForTravelers(
   }));
 }
 
+function loadState(): TripState {
+  try {
+    const stored = sessionStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return { ...initialState, ...JSON.parse(stored) } as TripState;
+    }
+  } catch { /* ignore corrupt data */ }
+  return initialState;
+}
+
 export function useTrip() {
   const [trip, setTrip] = useState<TripState>(loadState);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trip));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trip));
   }, [trip]);
 
   const setDestination = (id: string) =>
