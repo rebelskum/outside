@@ -93,6 +93,7 @@ export function TripBuilderPage() {
             onUpdateActivityParticipation={updateActivityParticipation}
             onRemoveAddOn={toggleAddOn}
             onUpdateAddOnParticipation={updateAddOnParticipation}
+            onGoToStep={goToStep}
           />
         );
       default:

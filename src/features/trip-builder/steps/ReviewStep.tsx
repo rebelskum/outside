@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import type { TripState, Participation, DateRange, TravelerGroup } from "../../../types/trip";
+import type { TripState, Participation, DateRange, TravelerGroup, StepId } from "../../../types/trip";
 import { getDestination, getLodging, getActivity, getAddOn } from "../../../data/selectors";
 import { getActiveBundle } from "../../../domain/services/bundles";
 import { calculateTotal, getBundleDiscount } from "../../../domain/services/pricing";
@@ -20,6 +20,7 @@ interface ReviewStepProps {
   onUpdateActivityParticipation: (id: string, participation: Participation) => void;
   onRemoveAddOn: (id: string) => void;
   onUpdateAddOnParticipation: (id: string, participation: Participation) => void;
+  onGoToStep?: (step: StepId) => void;
 }
 
 function TrashIcon() {
@@ -132,6 +133,7 @@ export function ReviewStep({
   onUpdateActivityParticipation,
   onRemoveAddOn,
   onUpdateAddOnParticipation,
+  onGoToStep,
 }: ReviewStepProps) {
   const [editingStay, setEditingStay] = useState(false);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
@@ -213,7 +215,12 @@ export function ReviewStep({
               })}
             </ul>
           ) : (
-            <p className="text-sm text-muted">No activities selected</p>
+            <button
+              onClick={() => onGoToStep?.("activities")}
+              className="text-xs text-bundle font-light hover:underline transition-colors"
+            >
+              + Activities
+            </button>
           )}
         </section>
 
@@ -245,7 +252,12 @@ export function ReviewStep({
               })}
             </ul>
           ) : (
-            <p className="text-sm text-muted">No extras selected</p>
+            <button
+              onClick={() => onGoToStep?.("extras")}
+              className="text-xs text-bundle font-light hover:underline transition-colors"
+            >
+              + Extras
+            </button>
           )}
 
           {discount > 0 && (
